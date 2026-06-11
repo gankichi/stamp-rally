@@ -43,8 +43,17 @@
         .slot-special { border-color: #fcd34d; background-color: #fffbeb; color: #fbbf24; }
         .slot-special.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: #d97706; color: white; }
 
-        /* 📸 ロゴ用画像スタイル（元のシンプルな状態に戻しました） */
-        .stamp-logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none; }
+        /* 📸 ロゴ用画像スタイル（文字の押し出しバグを完全に防ぐ修正） */
+        .stamp-logo-img { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            border-radius: 50%; 
+            display: none; 
+        }
         .stamp-slot.active .stamp-logo-img { display: block; }
 
         /* ヒント表示 */
