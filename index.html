@@ -3,33 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Stamp Rally Prototype</title>
+    <title>わくわく デジタルスタンプラリー</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background-color: #f7f9fa; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { font-size: 1.5rem; margin-bottom: 5px; color: #111; }
-        .lang-buttons { margin-bottom: 20px; }
-        .lang-btn { background: #e0e0e0; border: none; padding: 5px 10px; margin: 2px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; }
-        .lang-btn.active { background: #007bff; color: white; }
-        .description { font-size: 0.9rem; color: #666; margin-bottom: 20px; line-height: 1.4; }
+        /* [前回の可愛らしいスタイルを維持、A1アイコンのみ変更] */
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; background-color: #fff9e6; color: #4a4a4a; margin: 0; padding: 15px; }
+        .container { max-width: 480px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.05); border: 3px solid #ffd24d; }
         
-        .course-title { font-weight: bold; margin: 20px 0 10px 0; text-align: left; padding-left: 10px; border-left: 4px solid #007bff; }
-        .course-b { border-left-color: #dc3545; }
-        .course-rare { border-left-color: #ffc107; }
+        h1 { font-size: 1.6rem; color: #ff6f61; margin: 10px 0 5px 0; font-weight: bold; }
+        .description { font-size: 0.85rem; color: #7a7a7a; margin-bottom: 15px; background: #fff3cd; padding: 8px; border-radius: 10px; }
+        
+        .lang-buttons { margin-bottom: 15px; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
+        .lang-btn { background: #f0f0f0; border: 2px solid #ddd; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .lang-btn.active { background: #ff6f61; color: white; border-color: #ff6f61; }
+        
+        .course-section { background: #f0fdf4; padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 2px dashed #bbf7d0; }
+        .course-section.course-b { background: #eff6ff; border-color: #bfdbfe; }
+        .course-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .title-text-a { color: #16a34a; }
+        .title-text-b { color: #2563eb; }
 
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .rare-grid { grid-template-columns: 1fr; max-width: 100px; margin: 0 auto; }
-        .stamp-slot { aspect-ratio: 1; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background-color: #fafafa; color: #999; position: relative; font-weight: bold; }
-        .stamp-slot.active { border-style: solid; color: white; animation: pop 0.3s ease; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .stamp-slot { width: 100%; aspect-ratio: 1; border: 3px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; background-color: #fafafa; color: #aaa; font-weight: bold; cursor: pointer; position: relative; }
         
-        .slot-a.active { background-color: #007bff; border-color: #0056b3; }
-        .slot-b.active { background-color: #dc3545; border-color: #a71d2a; }
-        .slot-rare.active { background-color: #ffc107; border-color: #d39e00; color: #333; animation: glow 1s infinite alternate; }
+        .stamp-slot.active { border-style: solid; color: white; animation: pop 0.4s ease; }
+        .slot-a.active { background: linear-gradient(135deg, #4ade80, #22c55e); border-color: #16a34a; }
+        .slot-b.active { background: linear-gradient(135deg, #60a5fa, #3b82f6); border-color: #2563eb; }
+        
+        .slot-special { border-color: #fcd34d; color: #fbbf24; }
+        .slot-special.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: #d97706; }
 
-        .reset-btn { margin-top: 30px; background: none; border: 1px solid #ccc; color: #999; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        /* ヒント表示 */
+        .hint-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; min-height: 40px; margin-top: 15px; font-weight: bold; }
+        .hint-popup { color: #ff6f61; }
+
+        .reset-btn { margin-top: 25px; background: none; border: 1px solid #ddd; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; color: #bbb; cursor: pointer; }
         
-        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
-        @keyframes glow { 0% { box-shadow: 0 0 5px #ffc107; } 100% { box-shadow: 0 0 15px #ffc107; } }
+        /* A1のイラストを CSS で仮に再現 */
+        #stamp-a1.active::after {
+            content: '🏠'; /* 仮の絵文字アイコン */
+            font-size: 2rem;
+            position: absolute;
+        }
+        
+        @keyframes pop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -42,103 +58,141 @@
         <button class="lang-btn" onclick="setLanguage('ko')">한국어</button>
     </div>
 
-    <h1 id="title">デジタルスタンプラリー</h1>
-    <div id="desc" class="description">各スポットにあるQRコードを読み取ってスタンプを集めよう！</div>
+    <h1 id="title">わくわく スタンプラリー</h1>
+    <div id="desc" class="description">ビルをたんけんしてスタンプをあつめよう！<br>まるをタップするとヒントがみられるよ！</div>
 
-    <div id="title-a" class="course-title">Aコース</div>
-    <div class="grid">
-        <div id="stamp-a1" class="stamp-slot slot-a">A1</div>
-        <div id="stamp-a2" class="stamp-slot slot-a">A2</div>
-        <div id="stamp-a3" class="stamp-slot slot-a">A3</div>
-        <div id="stamp-a4" class="stamp-slot slot-a">A4</div>
+    <div class="course-section">
+        <div id="title-a" class="course-title title-text-a">🟢 こども館コース</div>
+        <div class="grid">
+            <div id="stamp-a1" class="stamp-slot slot-a" onclick="clickStamp('a1')">子ども館</div>
+            <div id="stamp-a2" class="stamp-slot slot-a" onclick="clickStamp('a2')">A2</div>
+            <div id="stamp-a3" class="stamp-slot slot-a" onclick="clickStamp('a3')">A3</div>
+            <div id="stamp-a4" class="stamp-slot slot-a slot-special" onclick="clickStamp('a4')">★A</div>
+        </div>
     </div>
 
-    <div id="title-b" class="course-title">Bコース</div>
-    <div class="grid">
-        <div id="stamp-b1" class="stamp-slot slot-b">B1</div>
-        <div id="stamp-b2" class="stamp-slot slot-b">B2</div>
-        <div id="stamp-b3" class="stamp-slot slot-b">B3</div>
-        <div id="stamp-b4" class="stamp-slot slot-b">B4</div>
+    <div class="course-section course-b">
+        <div id="title-b" class="course-title title-text-b">🔵 Bコース</div>
+        <div class="grid">
+            <div id="stamp-b1" class="stamp-slot slot-b" onclick="clickStamp('b1')">B1</div>
+            <div id="stamp-b2" class="stamp-slot slot-b" onclick="clickStamp('b2')">B2</div>
+            <div id="stamp-b3" class="stamp-slot slot-b" onclick="clickStamp('b3')">B3</div>
+            <div id="stamp-b4" class="stamp-slot slot-b slot-special" onclick="clickStamp('b4')">★B</div>
+        </div>
     </div>
 
-    <div id="title-rare" class="course-title">スペシャル</div>
-    <div class="grid rare-grid">
-        <div id="stamp-rare1" class="stamp-slot slot-rare">★</div>
+    <div id="hint-area" class="hint-box">
+        <span id="hint-text">スタンプのまるをタップしてみてね！</span>
     </div>
 
-    <button id="btn-reset" class="reset-btn" onclick="resetStamps()">スタンプをリセットする</button>
+    <button id="btn-reset" class="reset-btn" onclick="resetStamps()">リセット</button>
 </div>
 
 <script>
-    // 4ヶ国語の翻訳データ
+    // 施設HP（A1を変更）
+    const shopUrls = {
+        a1: "https://www.kodomo-how.com/", // 子ども館公式HP
+        a2: "https://example.com/a2",
+        a3: "https://example.com/a3",
+        a4: "https://example.com/special-a",
+        b1: "https://example.com/b1",
+        b2: "https://example.com/b2",
+        b3: "https://example.com/b3",
+        b4: "https://example.com/special-b"
+    };
+
     const translations = {
-        ja: { title: "デジタルスタンプラリー", desc: "各スポットにあるQRコードを読み取ってスタンプを集めよう！(※シークレットモード不可)", courseA: "Aコース", courseB: "Bコース", courseRare: "スペシャル", reset: "スタンプをリセットする", get: "ゲット！" },
-        en: { title: "Digital Stamp Rally", desc: "Scan QR codes at each spot to collect stamps! (*Private mode strictly disabled)", courseA: "Course A", courseB: "Course B", courseRare: "Special", reset: "Reset Stamps", get: "Get!" },
-        zh: { title: "数字集章活動", desc: "扫描每个地点的二维码来收集印章！(*请勿使用无痕模式)", courseA: "A路线", courseB: "B路线", courseRare: "特别章", reset: "重置印章", get: "获得！" },
-        ko: { title: "디지털 스탬프 랠리", desc: "각 스폿에 있는 QR 코드를 스캔하여 스탬프를 모으자! (*시크릿 모드 사용 불가)", courseA: "A 코스", courseB: "B 코스", courseRare: "스페셜", reset: "스탬프 리셋", get: "획득!" }
+        ja: {
+            title: "わくわく スタンプラリー", desc: "ビルをたんけんしてスタンプをあつめよう！<br>まるをタップするとヒントがみられるよ！", courseA: "🟢 こども館コース", courseB: "🔵 Bコース", reset: "リセット", get: "ひらく",
+            hints: {
+                click_get: "💡スタンプ獲得済み！タップすると「子ども館」のHPが開くよ！",
+                default: "スタンプのまるをタップしてみてね！",
+                a1: "【ヒント】地下1階の「子ども館」入り口にあるよ！",
+                a2: "【ヒント】2階のエレベーターの近くを探してね！",
+                a3: "【ヒント】3階のこども広場の中にあるよ！",
+                a4: "【スペシャルヒントA】7階の特別な場所にあるよ！",
+                b1: "【ヒント】1階の入り口のすぐ近くにあるよ！",
+                b2: "【ヒント】2階のおもちゃコーナーを探してみてね！",
+                b3: "【ヒント】5階のレストランの近くにあるよ！",
+                b4: "【スペシャルヒントB】7階の展望テラスを探してみよう！"
+            }
+        },
+        en: { title: "WakuWaku Stamp Rally", desc: "Explore and collect stamps!<br>Tap circles for hints!", courseA: "🟢 Children's Hall", courseB: "🔵 Course B", reset: "Reset", get: "Open", hints: { click_get: "💡 Collected! Tap to open Children's Hall website!", default: "Tap a circle for a hint!", a1: "[Hint] Near the input of Children's Hall (B1F)!", a2: "[Hint] Near the elevator (2nd Floor)!", a3: "[Hint] Inside the Kids Play Area (3rd Floor)!", a4: "[Special Hint A] 7th Floor!", b1: "[Hint] Near the entrance (1F)!", b2: "[Hint] Toy section (2F)!", b3: "[Hint] Near the restaurant (5F)!", b4: "[Special Hint B] Observation Terrace (7F)!" } },
+        zh: { title: "集章活動", desc: "探索并收集印章！<br>点击圆圈查看提示！", courseA: "🟢 儿童馆路线", courseB: "🔵 B路线", reset: "重置", get: "打开", hints: { click_get: "💡 已获得！点击打开儿童馆网站！", default: "点击圆圈查看提示！", a1: "【提示】地下一层（B1）的儿童馆入口附近！", a2: "【提示】去2楼的电梯附近！", a3: "【提示】在3楼的儿童广场里面哦！", a4: "【特别提示A】在7楼！", b1: "【提示】在1楼大门口附近！", b2: "【提示】在2楼的玩具区！", b3: "【提示】在5楼的餐厅附近哦！", b4: "【特别提示B】去7楼的展望台找找看吧！" } },
+        ko: { title: "스탬프 랠리", desc: "탐험하며 스탬프를 모으자!<br>원을 탭하면 힌트를 볼 수 있어!", courseA: "🟢 어린이관 코스", courseB: "🔵 B 코스", reset: "리셋", get: "열기", hints: { click_get: "💡 획득 완료! 탭하면 어린이관 홈페이지가 열려요!", default: "스탬프 원을 탭해 보세요!", a1: "【힌트】지하 1층 어린이관 입구 근처에 있어!", a2: "【힌트】2층 엘리베이터 근처!", a3: "【힌트】3층 어린이 광장 안에!", a4: "【스페셜 힌트A】7층!", b1: "【힌트】1층 입구 근처!", b2: "【힌트】2층 장난감 코너!", b3: "【힌트】5층 레스토랑 근처!", b4: "【스페셜 힌트B】7층 전망 테라스!" } }
     };
 
     let currentLang = 'ja';
 
-    // 画面の文字を切り替える関数
     function setLanguage(lang) {
         currentLang = lang;
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
-
-        document.getElementById('title').innerText = translations[lang].title;
-        document.getElementById('desc').innerText = translations[lang].desc;
-        document.getElementById('title-a').innerText = translations[lang].courseA;
-        document.getElementById('title-b').innerText = translations[lang].courseB;
-        document.getElementById('title-rare').innerText = translations[lang].courseRare;
-        document.getElementById('btn-reset').innerText = translations[lang].reset;
-        
+        document.getElementById('title').innerHTML = translations[lang].title;
+        document.getElementById('desc').innerHTML = translations[lang].desc;
+        document.getElementById('title-a').innerHTML = translations[lang].courseA;
+        document.getElementById('title-b').innerHTML = translations[lang].courseB;
+        document.getElementById('btn-reset').innerHTML = translations[lang].reset;
+        document.getElementById('hint-text').innerHTML = translations[currentLang].hints.default;
         updateStampDisplay();
     }
 
-    // スタンプ状況を画面に反映する関数
+    function clickStamp(id) {
+        const stamps = JSON.parse(localStorage.getItem('digital-stamp-rally') || '{}');
+        const hintArea = document.getElementById('hint-text');
+        if (stamps[id]) {
+            hintArea.innerHTML = `<span class="hint-popup" style="cursor:pointer; text-decoration:underline;" onclick="window.open('${shopUrls[id]}', '_blank')">${translations[currentLang].hints.click_get} [${translations[currentLang].get}]</span>`;
+        } else {
+            hintArea.innerHTML = `<span class="hint-popup">${translations[currentLang].hints[id]}</span>`;
+        }
+    }
+
     function updateStampDisplay() {
         const stamps = JSON.parse(localStorage.getItem('digital-stamp-rally') || '{}');
-        
-        // 各スロットの状態更新
-        ['a1','a2','a3','a4','b1','b2','b3','b4','rare1'].forEach(id => {
+        ['a1','a2','a3','a4','b1','b2','b3','b4'].forEach(id => {
             const slot = document.getElementById('stamp-' + id);
             if (stamps[id]) {
                 slot.classList.add('active');
-                slot.innerText = translations[currentLang].get;
+                if (id === 'a1') {
+                    slot.innerText = ""; // A1はCSSのイラストのみにする
+                } else {
+                    slot.innerText = "✓";
+                }
             } else {
                 slot.classList.remove('active');
-                slot.innerText = id === 'rare1' ? '★' : id.toUpperCase();
+                if (id === 'a1') {
+                    slot.innerText = "子ども館";
+                } else {
+                    slot.innerText = id.includes('4') ? '★' : id.toUpperCase();
+                }
             }
         });
     }
 
-    // URLのパラメーター(?spot=a1など)をチェックしてスタンプを押す処理
     function checkURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        const spotId = urlParams.get('spot'); // 例: ?spot=a1
-        
+        const spotId = urlParams.get('spot');
         if (spotId) {
             let stamps = JSON.parse(localStorage.getItem('digital-stamp-rally') || '{}');
-            stamps[spotId] = true; // スタンプを記録
+            stamps[spotId] = true;
             localStorage.setItem('digital-stamp-rally', JSON.stringify(stamps));
-            
-            // アドレスバーからパラメータを消してスッキリさせる(リロード対策)
             const cleanURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
             window.history.replaceState({}, document.title, cleanURL);
+            setTimeout(() => {
+                document.getElementById('hint-text').innerHTML = `<span class="hint-popup">🎉 スタンプゲット！タップすると施設HPを見られるよ！</span>`;
+            }, 500);
         }
         updateStampDisplay();
     }
 
-    // テスト用のリセット機能
     function resetStamps() {
         if (confirm('スタンプをすべて消去しますか？')) {
             localStorage.removeItem('digital-stamp-rally');
+            document.getElementById('hint-text').innerHTML = translations[currentLang].hints.default;
             updateStampDisplay();
         }
     }
 
-    // 起動時にURLをチェック
     window.onload = checkURL;
 </script>
 </body>
