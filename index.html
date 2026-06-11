@@ -16,11 +16,11 @@
         .lang-btn { background: #f0f0f0; border: 2px solid #ddd; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #666; }
         .lang-btn.active { background: #ff6f61; color: white; border-color: #ff6f61; }
         
-        /* 🔥 カメラ起動ボタンのスタイル */
+        /* カメラ起動ボタン */
         .scan-trigger-btn { background: linear-gradient(135deg, #ff6f61, #ff8b80); color: white; border: none; font-size: 1.1rem; font-weight: bold; padding: 12px 24px; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(255,111,97,0.4); margin-bottom: 20px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
         .scan-trigger-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(255,111,97,0.4); }
         
-        /* カメラ表示エリア */
+        /* カメラ用モーダル */
         #camera-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
         #reader { width: 90%; max-width: 350px; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         .close-camera-btn { margin-top: 20px; background: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; color: #333; cursor: pointer; }
@@ -32,9 +32,9 @@
         .title-text-a { color: #16a34a; }
         .title-text-b { color: #2563eb; }
 
-        /* 5マス配置 */
+        /* グリッド配置 */
         .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .stamp-slot { width: 100%; aspect-ratio: 1; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background-color: #fafafa; color: #aaa; font-weight: bold; cursor: pointer; position: relative; box-sizing: border-box; }
+        .stamp-slot { width: 100%; aspect-ratio: 1; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background-color: #fafafa; color: #aaa; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; box-sizing: border-box; }
         
         .stamp-slot.active { border-style: solid; color: white; animation: pop 0.4s ease; }
         .slot-a.active { background: linear-gradient(135deg, #4ade80, #22c55e); border-color: #16a34a; }
@@ -43,14 +43,16 @@
         .slot-special { border-color: #fcd34d; background-color: #fffbeb; color: #fbbf24; }
         .slot-special.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: #d97706; color: white; }
 
+        /* 📸 子どもの館のロゴ用画像スタイル */
+        .stamp-logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none; }
+        .stamp-slot.active .stamp-logo-img { display: block; }
+
         /* ヒント表示 */
         .hint-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; min-height: 45px; margin-top: 15px; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; line-height: 1.4; }
         .hint-popup { color: #ff6f61; }
         .link-text { color: #2563eb; text-decoration: underline; cursor: pointer; }
 
         .reset-btn { margin-top: 25px; background: none; border: 1px solid #ddd; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; color: #bbb; cursor: pointer; }
-        
-        #stamp-w1.active::after { content: '🏠'; font-size: 1.6rem; position: absolute; }
         
         @keyframes pop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
     </style>
@@ -75,7 +77,10 @@
     <div class="course-section">
         <div id="title-a" class="course-title title-text-a">🟢 わくわくコース</div>
         <div class="grid">
-            <div id="stamp-w1" class="stamp-slot slot-a" onclick="clickStamp('w1')">W1</div>
+            <div id="stamp-w1" class="stamp-slot slot-a" onclick="clickStamp('w1')">
+                W1
+                <img src="館ロゴ.png" class="stamp-logo-img" alt="子どもの館">
+            </div>
             <div id="stamp-w2" class="stamp-slot slot-a" onclick="clickStamp('w2')">W2</div>
             <div id="stamp-w3" class="stamp-slot slot-a" onclick="clickStamp('w3')">W3</div>
             <div id="stamp-w4" class="stamp-slot slot-a" onclick="clickStamp('w4')">W4</div>
@@ -119,7 +124,7 @@
             hints: {
                 click_get: "💡スタンプゲット済み！<br><span class='link-text'>👇 タップしてホームページをみてね！</span>",
                 default: "スタンプのまるをタップしてみてね！",
-                w1: "【ヒント】ちか1かい の 「子ども館」の 入口の ちかくに あるよ！",
+                w1: "【ヒント】赤のエレベーターで7階へ！スタンプは受付の近くだよ♪",
                 w2: "【ヒント】2かい の エレベーターの ちかくを さがしてね！",
                 w3: "【ヒント】3かい の 広場（ひろば）の なかに あるよ！",
                 w4: "【ヒント】5かい の お店の ちかくを まわってみよう！",
@@ -131,9 +136,9 @@
                 u5: "【スペシャルヒント】7かい の 展望（てんぼう）テラス を さがしてみよう！"
             }
         },
-        en: { title: "WakuWaku Stamp Rally", desc: "Tap the button below to scan QR codes!<br>Collect stamps without opening new tabs!", courseA: "🟢 WakuWaku Course", courseB: "🔵 UkiUki Course", reset: "Reset", scanText: "Scan QR Code", hints: { click_get: "💡 Stamp Collected!<br><span class='link-text'>👇 Tap to view the website!</span>", default: "Tap a circle to see the hint!", w1: "[Hint] B1 Floor Children's Hall!", w2: "[Hint] 2nd Floor Elevator!", w3: "[Hint] 3rd Floor Area!", w4: "[Hint] 5th Floor Shop!", w5: "[Special Hint] 7th Floor!", u1: "[Hint] 1st Floor Entrance!", u2: "[Hint] 2nd Floor Hallway!", u3: "[Hint] 3rd Floor Corner!", u4: "[Hint] 5th Floor Rest Area!", u5: "[Special Hint] 7th Floor Terrace!" } },
-        zh: { title: "欢欣雀跃 集章活動", desc: "点击下方按钮扫描二维码！<br>无需打开新标签页即可集章！", courseA: "🟢 欢欣雀跃路线", courseB: "🔵 无忧无虑路线", reset: "重置", scanText: "扫描二维码", hints: { click_get: "💡 已获得印章！<br><span class='link-text'>👇 点击查看官方网站！</span>", default: "点击圆圈查看提示！", w1: "【提示】地下一层儿童馆！", w2: "【提示】2楼电梯附近！", w3: "【提示】3楼广场！", w4: "【提示】5楼商店！", w5: "【特别提示】7楼！", u1: "【提示】1楼正门！", u2: "【提示】2楼走廊！", u3: "【提示】3楼角落！", u4: "【提示】5楼休息区！", u5: "【特别提示】7楼展望台！" } },
-        ko: { title: "두근두근 스탬프 랠리", desc: "아래 버튼을 눌러 QR 코드를 스캔하세요!<br>새 탭을 열지 않고 스탬프를 모을 수 있어요!", courseA: "🟢 와쿠와쿠 코스", courseB: "🔵 우키우키 코스", reset: "리셋", scanText: "QR코드 스캔하기", hints: { click_get: "💡 스탬프 획득 완료!<br><span class='link-text'>👇 탭하여 홈페이지를 확인해봐!</span>", default: "스탬프 원을 탭해 보세요!", w1: "【힌트】지하 1층 어린이관!", w2: "【힌트】2층 엘리베이터!", w3: "【힌트】3층 광장!", w4: "【힌트】5층 매장!", w5: "【스페셜 힌트】7층!", u1: "【힌트】1층 정문!", u2: "【힌트】2층 복도!", u3: "【힌트】3층 구석!", u4: "【힌트】5층 휴게실!", u5: "【스페셜 힌트】7층 전망대!" } }
+        en: { title: "WakuWaku Stamp Rally", desc: "Tap the button below to scan QR codes!<br>Collect stamps without opening new tabs!", courseA: "🟢 WakuWaku Course", courseB: "🔵 UkiUki Course", reset: "Reset", scanText: "Scan QR Code", hints: { click_get: "💡 Stamp Collected!<br><span class='link-text'>👇 Tap to view the website!</span>", default: "Tap a circle to see the hint!", w1: "[Hint] Take the red elevator to the 7th floor! It's near the reception♪", w2: "[Hint] 2nd Floor Elevator!", w3: "[Hint] 3rd Floor Area!", w4: "[Hint] 5th Floor Shop!", w5: "[Special Hint] 7th Floor!", u1: "[Hint] 1st Floor Entrance!", u2: "[Hint] 2nd Floor Hallway!", u3: "[Hint] 3rd Floor Corner!", u4: "[Hint] 5th Floor Rest Area!", u5: "[Special Hint] 7th Floor Terrace!" } },
+        zh: { title: "欢欣雀跃 集章活動", desc: "点击下方按钮扫描二维码！<br>无需打开新标签页即可集章！", courseA: "🟢 欢欣雀跃路线", courseB: "🔵 无忧无虑路线", reset: "重置", scanText: "扫描二维码", hints: { click_get: "💡 已获得印章！<br><span class='link-text'>👇 点击查看官方网站！</span>", default: "点击圆圈查看提示！", w1: "【提示】搭乘红色电梯前往7楼！就在前台附近♪", w2: "【提示】2楼电梯附近！", w3: "【提示】3楼广场！", w4: "【提示】5楼商店！", w5: "【特别提示】7楼！", u1: "【提示】1楼正门！", u2: "【提示】2楼走廊！", u3: "【提示】3楼角落！", u4: "【提示】5楼休息区！", u5: "【特别提示】7楼展望台！" } },
+        ko: { title: "두근두근 스탬프 랠리", desc: "아래 버튼을 눌러 QR 코드를 스캔하세요!<br>새 탭을 열지 않고 스탬프를 모을 수 있어요!", courseA: "🟢 와쿠와쿠 코스", courseB: "🔵 우키우키 코스", reset: "리셋", scanText: "QR코드 스캔하기", hints: { click_get: "💡 스탬프 획득 완료!<br><span class='link-text'>👇 탭하여 홈페이지를 확인해봐!</span>", default: "스탬프 원을 탭해 보세요!", w1: "【힌트】빨간색 엘리베이터를 타고 7층으로! 안내데스크 근처에 있어요♪", w2: "【힌트】2층 엘리베이터!", w3: "【힌트】3층 광장!", w4: "【힌트】5층 매장!", w5: "【스페셜 힌트】7층!", u1: "【힌트】1층 정门!", u2: "【힌트】2층 복도!", u3: "【힌트】3층 구석!", u4: "【힌트】5층 휴게실!", u5: "【스페셜 힌트】7층 전망대!" } }
     };
 
     let currentLang = 'ja';
@@ -153,33 +158,23 @@
         updateStampDisplay();
     }
 
-    // 🔥 カメラを起動する処理
     function openCamera() {
         document.getElementById('camera-modal').style.display = 'flex';
-        
-        // カメラの初期設定
         html5QrcodeScanner = new Html5Qrcode("reader");
         html5QrcodeScanner.start(
-            { facingMode: "environment" }, // 背面カメラを使用
-            {
-                fps: 10,    // 1秒間に10回スキャン
-                qrbox: { width: 250, height: 250 } // スキャンする枠の大きさ
-            },
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
             (qrCodeMessage) => {
-                // 🟢 QRコードの読み取りに成功した時
                 processQRCode(qrCodeMessage);
-                closeCamera(); // カメラを閉じる
+                closeCamera();
             },
-            (errorMessage) => {
-                // スキャン中のエラー（無視してOK）
-            }
+            (errorMessage) => {}
         ).catch((err) => {
             alert("カメラの起動に失敗しました。カメラの許可を確認してください。");
             closeCamera();
         });
     }
 
-    // 🔥 カメラを閉じる処理
     function closeCamera() {
         document.getElementById('camera-modal').style.display = 'none';
         if (html5QrcodeScanner) {
@@ -189,7 +184,6 @@
         }
     }
 
-    // 🔥 読み取ったURLからスタンプを押すコア処理
     function processQRCode(urlText) {
         try {
             const url = new URL(urlText);
@@ -216,7 +210,7 @@
                 alert("このQRコードは、今回のスタンプラリー用ではないようです！");
             }
         } catch (e) {
-            alert("QRコードの読み取りに失敗しました。正しいQRコードか確認してください。");
+            alert("QRコードの読み取りに失敗しました。");
         }
     }
 
@@ -236,7 +230,7 @@
             const slot = document.getElementById('stamp-' + id);
             if (stamps[id]) {
                 slot.classList.add('active');
-                slot.innerText = (id === 'w1') ? "" : "✓";
+                if (id !== 'w1') slot.innerText = "✓";
             } else {
                 slot.classList.remove('active');
                 slot.innerText = (id === 'w5') ? '★' : id.toUpperCase();
