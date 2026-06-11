@@ -43,9 +43,8 @@
         .slot-special { border-color: #fcd34d; background-color: #fffbeb; color: #fbbf24; }
         .slot-special.active { background: linear-gradient(135deg, #fbbf24, #f59e0b); border-color: #d97706; color: white; }
 
-        /* 📸 子どもの館のロゴ用画像スタイル */
-        /* 📸 子どもの館のロゴ用画像スタイル */
-        .stamp-logo-img { width: 112%; height: 112%; object-fit: cover; border-radius: 50%; display: none; margin-top: -8%; margin-left: -7%; }
+        /* 📸 ロゴ用画像スタイル（元のシンプルな状態に戻しました） */
+        .stamp-logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none; }
         .stamp-slot.active .stamp-logo-img { display: block; }
 
         /* ヒント表示 */
@@ -80,7 +79,7 @@
         <div class="grid">
             <div id="stamp-w1" class="stamp-slot slot-a" onclick="clickStamp('w1')">
                 W1
-                <img src="YfZfx_2e.jpg?1" class="stamp-logo-img" alt="子どもの館">
+                <img src="HOW_logo_W1.png?1" class="stamp-logo-img" alt="子どもの館">
             </div>
             <div id="stamp-w2" class="stamp-slot slot-a" onclick="clickStamp('w2')">W2</div>
             <div id="stamp-w3" class="stamp-slot slot-a" onclick="clickStamp('w3')">W3</div>
@@ -139,7 +138,7 @@
         },
         en: { title: "WakuWaku Stamp Rally", desc: "Tap the button below to scan QR codes!<br>Collect stamps without opening new tabs!", courseA: "🟢 WakuWaku Course", courseB: "🔵 UkiUki Course", reset: "Reset", scanText: "Scan QR Code", hints: { click_get: "💡 Stamp Collected!<br><span class='link-text'>👇 Tap to view the website!</span>", default: "Tap a circle to see the hint!", w1: "[Hint] Take the red elevator to the 7th floor! It's near the reception♪", w2: "[Hint] 2nd Floor Elevator!", w3: "[Hint] 3rd Floor Area!", w4: "[Hint] 5th Floor Shop!", w5: "[Special Hint] 7th Floor!", u1: "[Hint] 1st Floor Entrance!", u2: "[Hint] 2nd Floor Hallway!", u3: "[Hint] 3rd Floor Corner!", u4: "[Hint] 5th Floor Rest Area!", u5: "[Special Hint] 7th Floor Terrace!" } },
         zh: { title: "欢欣雀跃 集章活動", desc: "点击下方按钮扫描二维码！<br>无需打开新标签页即可集章！", courseA: "🟢 欢欣雀跃路线", courseB: "🔵 无忧无虑路线", reset: "重置", scanText: "扫描二维码", hints: { click_get: "💡 已获得印章！<br><span class='link-text'>👇 点击查看官方网站！</span>", default: "点击圆圈查看提示！", w1: "【提示】搭乘红色电梯前往7楼！就在前台附近♪", w2: "【提示】2楼电梯附近！", w3: "【提示】3楼广场！", w4: "【提示】5楼商店！", w5: "【特别提示】7楼！", u1: "【提示】1楼正门！", u2: "【提示】2楼走廊！", u3: "【提示】3楼角落！", u4: "【提示】5楼休息区！", u5: "【特别提示】7楼展望台！" } },
-        ko: { title: "두근두근 스탬프 랠리", desc: "아래 버튼을 눌러 QR 코드를 스캔하세요!<br>새 탭을 열지 않고 스탬프를 모을 수 있어요!", courseA: "🟢 와쿠와쿠 코스", courseB: "🔵 우키우키 코스", reset: "리셋", scanText: "QR코드 스캔하기", hints: { click_get: "💡 스탬프 획득 완료!<br><span class='link-text'>👇 탭하여 홈페이지를 확인해봐!</span>", default: "스탬프 원을 탭해 보세요!", w1: "【힌트】빨간색 엘리베이터를 타고 7층으로! 안내데스크 근처에 있어요♪", w2: "【힌트】2층 엘리베이터!", w3: "【힌트】3층 광장!", w4: "【힌트】5층 매장!", w5: "【스페셜 힌트】7층!", u1: "【힌트】1층 정门!", u2: "【힌트】2층 복도!", u3: "【힌트】3층 구석!", u4: "【힌트】5층 휴게실!", u5: "【스페셜 힌트】7층 전망대!" } }
+        ko: { title: "두근두근 스탬프 랠り", desc: "아래 버튼을 눌러 QR 코드를 스캔하세요!<br>새 탭을 열지 않고 스탬프를 모을 수 있어요!", courseA: "🟢 와쿠와쿠 코스", courseB: "🔵 우키우키 코스", reset: "리셋", scanText: "QR코드 스캔하기", hints: { click_get: "💡 스탬프 획득 완료!<br><span class='link-text'>👇 탭하여 홈페이지를 확인해봐!</span>", default: "스탬프 원을 탭해 보세요!", w1: "【힌트】빨간색 엘리베이터를 타고 7층으로! 안내데스크 근처에 있어요♪", w2: "【힌트】2층 엘리베이터!", w3: "【힌트】3층 광장!", w4: "【힌트】5층 매장!", w5: "【스페셜 힌트】7층!", u1: "【힌트】1층 정문!", u2: "【힌트】2층 복도!", u3: "【힌트】3층 구석!", u4: "【힌트】5층 휴게실!", u5: "【스페셜 힌트】7층 전망대!" } }
     };
 
     let currentLang = 'ja';
