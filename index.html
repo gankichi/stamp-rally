@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Stamp Rally Prototype</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f7f9fa; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.5rem; margin-bottom: 5px; color: #111; }
+        .lang-buttons { margin-bottom: 20px; }
+        .lang-btn { background: #e0e0e0; border: none; padding: 5px 10px; margin: 2px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; }
+        .lang-btn.active { background: #007bff; color: white; }
+        .description { font-size: 0.9rem; color: #666; margin-bottom: 20px; line-height: 1.4; }
+        
+        .course-title { font-weight: bold; margin: 20px 0 10px 0; text-align: left; padding-left: 10px; border-left: 4px solid #007bff; }
+        .course-b { border-left-color: #dc3545; }
+        .course-rare { border-left-color: #ffc107; }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .rare-grid { grid-template-columns: 1fr; max-width: 100px; margin: 0 auto; }
+        .stamp-slot { aspect-ratio: 1; border: 2px dashed #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background-color: #fafafa; color: #999; position: relative; font-weight: bold; }
+        .stamp-slot.active { border-style: solid; color: white; animation: pop 0.3s ease; }
+        
+        .slot-a.active { background-color: #007bff; border-color: #0056b3; }
+        .slot-b.active { background-color: #dc3545; border-color: #a71d2a; }
+        .slot-rare.active { background-color: #ffc107; border-color: #d39e00; color: #333; animation: glow 1s infinite alternate; }
+
+        .reset-btn { margin-top: 30px; background: none; border: 1px solid #ccc; color: #999; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+        @keyframes glow { 0% { box-shadow: 0 0 5px #ffc107; } 100% { box-shadow: 0 0 15px #ffc107; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="lang-buttons">
+        <button class="lang-btn active" onclick="setLanguage('ja')">日本語</button>
+        <button class="lang-btn" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">中文</button>
+        <button class="lang-btn" onclick="setLanguage('ko')">한국어</button>
+    </div>
+
+    <h1 id="title">デジタルスタンプラリー</h1>
+    <div id="desc" class="description">各スポットにあるQRコードを読み取ってスタンプを集めよう！</div>
+
+    <div id="title-a" class="course-title">Aコース</div>
+    <div class="grid">
+        <div id="stamp-a1" class="stamp-slot slot-a">A1</div>
+        <div id="stamp-a2" class="stamp-slot slot-a">A2</div>
+        <div id="stamp-a3" class="stamp-slot slot-a">A3</div>
+        <div id="stamp-a4" class="stamp-slot slot-a">A4</div>
+    </div>
+
+    <div id="title-b" class="course-title">Bコース</div>
+    <div class="grid">
+        <div id="stamp-b1" class="stamp-slot slot-b">B1</div>
+        <div id="stamp-b2" class="stamp-slot slot-b">B2</div>
+        <div id="stamp-b3" class="stamp-slot slot-b">B3</div>
+        <div id="stamp-b4" class="stamp-slot slot-b">B4</div>
+    </div>
+
+    <div id="title-rare" class="course-title">スペシャル</div>
+    <div class="grid rare-grid">
+        <div id="stamp-rare1" class="stamp-slot slot-rare">★</div>
+    </div>
+
+    <button id="btn-reset" class="reset-btn" onclick="resetStamps()">スタンプをリセットする</button>
+</div>
+
+<script>
+    // 4ヶ国語の翻訳データ
+    const translations = {
+        ja: { title: "デジタルスタンプラリー", desc: "各スポットにあるQRコードを読み取ってスタンプを集めよう！(※シークレットモード不可)", courseA: "Aコース", courseB: "Bコース", courseRare: "スペシャル", reset: "スタンプをリセットする", get: "ゲット！" },
+        en: { title: "Digital Stamp Rally", desc: "Scan QR codes at each spot to collect stamps! (*Private mode strictly disabled)", courseA: "Course A", courseB: "Course B", courseRare: "Special", reset: "Reset Stamps", get: "Get!" },
+        zh: { title: "数字集章活動", desc: "扫描每个地点的二维码来收集印章！(*请勿使用无痕模式)", courseA: "A路线", courseB: "B路线", courseRare: "特别章", reset: "重置印章", get: "获得！" },
+        ko: { title: "디지털 스탬프 랠리", desc: "각 스폿에 있는 QR 코드를 스캔하여 스탬프를 모으자! (*시크릿 모드 사용 불가)", courseA: "A 코스", courseB: "B 코스", courseRare: "스페셜", reset: "스탬프 리셋", get: "획득!" }
+    };
+
+    let currentLang = 'ja';
+
+    // 画面の文字を切り替える関数
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        document.getElementById('title').innerText = translations[lang].title;
+        document.getElementById('desc').innerText = translations[lang].desc;
+        document.getElementById('title-a').innerText = translations[lang].courseA;
+        document.getElementById('title-b').innerText = translations[lang].courseB;
+        document.getElementById('title-rare').innerText = translations[lang].courseRare;
+        document.getElementById('btn-reset').innerText = translations[lang].reset;
+        
+        updateStampDisplay();
+    }
+
+    // スタンプ状況を画面に反映する関数
+    function updateStampDisplay() {
+        const stamps = JSON.parse(localStorage.getItem('digital-stamp-rally') || '{}');
+        
+        // 各スロットの状態更新
+        ['a1','a2','a3','a4','b1','b2','b3','b4','rare1'].forEach(id => {
+            const slot = document.getElementById('stamp-' + id);
+            if (stamps[id]) {
+                slot.classList.add('active');
+                slot.innerText = translations[currentLang].get;
+            } else {
+                slot.classList.remove('active');
+                slot.innerText = id === 'rare1' ? '★' : id.toUpperCase();
+            }
+        });
+    }
+
+    // URLのパラメーター(?spot=a1など)をチェックしてスタンプを押す処理
+    function checkURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const spotId = urlParams.get('spot'); // 例: ?spot=a1
+        
+        if (spotId) {
+            let stamps = JSON.parse(localStorage.getItem('digital-stamp-rally') || '{}');
+            stamps[spotId] = true; // スタンプを記録
+            localStorage.setItem('digital-stamp-rally', JSON.stringify(stamps));
+            
+            // アドレスバーからパラメータを消してスッキリさせる(リロード対策)
+            const cleanURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanURL);
+        }
+        updateStampDisplay();
+    }
+
+    // テスト用のリセット機能
+    function resetStamps() {
+        if (confirm('スタンプをすべて消去しますか？')) {
+            localStorage.removeItem('digital-stamp-rally');
+            updateStampDisplay();
+        }
+    }
+
+    // 起動時にURLをチェック
+    window.onload = checkURL;
+</script>
+</body>
+</html>
