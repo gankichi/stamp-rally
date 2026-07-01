@@ -91,7 +91,7 @@
             margin-bottom: 20px;
             color: #665544;
             line-height: 1.5;
-            text-align: left; /* 先着案内を読みやすくするため左寄せに調整 */
+            text-align: left;
         }
         
         /* スキャンボタン */
@@ -172,13 +172,6 @@
             cursor: default;
         }
         
-        /* 押されたスタンプ（リンクの入る枠） */
-        .stamp-link {
-            width: 100%;
-            height: 100%;
-            display: block;
-            border-radius: 50%;
-        }
         .stamp-image {
             width: 100%;
             height: 100%;
@@ -186,6 +179,7 @@
             object-fit: cover;
         }
 
+        /* 状態メッセージ・情報表示エリア */
         .status-msg {
             background-color: #f3f4f6;
             padding: 15px;
@@ -194,12 +188,28 @@
             font-weight: bold;
             margin-top: 10px;
             border: 1px solid #e5e7eb;
-            min-height: 44px;
+            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            gap: 8px;
         }
+
+        /* エリア内に出るホームページボタン */
+        .facility-link-btn {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: white !important;
+            text-decoration: none;
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 20px;
+            margin-top: 5px;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            font-weight: bold;
+        }
+
         .reset-btn {
             background-color: transparent;
             color: #9ca3af;
@@ -272,6 +282,11 @@
             border: 3px solid #ffffff !important;
             font-size: 18px !important;
         }
+        body.high-contrast .facility-link-btn {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #ffffff !important;
+        }
         body.high-contrast .reset-btn {
             background-color: #000000 !important;
             color: #ffffff !important;
@@ -315,10 +330,10 @@
     <div class="course-section course-w">
         <div class="course-title">🟢 <span id="titleW">わくわくコース</span></div>
         <div class="stamp-grid">
-            <div class="stamp-slot" id="slot-W1" onclick="showHint('W1')">W1</div>
-            <div class="stamp-slot" id="slot-W2" onclick="showHint('W2')">W2</div>
-            <div class="stamp-slot" id="slot-W3" onclick="showHint('W3')">W3</div>
-            <div class="stamp-slot" id="slot-W4" onclick="showHint('W4')">W4</div>
+            <div class="stamp-slot" id="slot-W1" onclick="handleSlotClick('W1')">W1</div>
+            <div class="stamp-slot" id="slot-W2" onclick="handleSlotClick('W2')">W2</div>
+            <div class="stamp-slot" id="slot-W3" onclick="handleSlotClick('W3')">W3</div>
+            <div class="stamp-slot" id="slot-W4" onclick="handleSlotClick('W4')">W4</div>
             <div class="stamp-slot goal" id="slot-W-goal">★</div>
         </div>
     </div>
@@ -327,15 +342,15 @@
     <div class="course-section course-u">
         <div class="course-title">🔵 <span id="titleU">うきうきコース</span></div>
         <div class="stamp-grid">
-            <div class="stamp-slot" id="slot-U1" onclick="showHint('U1')">U1</div>
-            <div class="stamp-slot" id="slot-U2" onclick="showHint('U2')">U2</div>
-            <div class="stamp-slot" id="slot-U3" onclick="showHint('U3')">U3</div>
-            <div class="stamp-slot" id="slot-U4" onclick="showHint('U4')">U4</div>
+            <div class="stamp-slot" id="slot-U1" onclick="handleSlotClick('U1')">U1</div>
+            <div class="stamp-slot" id="slot-U2" onclick="handleSlotClick('U2')">U2</div>
+            <div class="stamp-slot" id="slot-U3" onclick="handleSlotClick('U3')">U3</div>
+            <div class="stamp-slot" id="slot-U4" onclick="handleSlotClick('U4')">U4</div>
             <div class="stamp-slot goal" id="slot-U-goal">★</div>
         </div>
     </div>
 
-    <!-- 状態メッセージ -->
+    <!-- 状態メッセージ・情報表示エリア -->
     <div class="status-msg" id="statusMsg">
         QRコードをよみとってスタンプをあつめよう！
     </div>
@@ -344,22 +359,54 @@
 </div>
 
 <script>
-    // --- 各スポットの施設ホームページURL ---
-    const spotLinks = {
-        "W1": "https://www.google.com",
-        "W2": "https://www.yahoo.co.jp",
-        "W3": "https://www.bing.com",
-        "W4": "https://www.wikipedia.org",
-        "U1": "https://www.google.com",
-        "U2": "https://www.yahoo.co.jp",
-        "U3": "https://www.bing.com",
-        "U4": "https://www.wikipedia.org"
+    // --- 【重要】各施設の詳細データ ---
+    const spotDetails = {
+        ja: {
+            "W1": { name: "北九州市立子どもの館", message: "子どもの楽しいが 詰まった屋内遊戯施設♪", url: "https://www.kodomo-how.com/" },
+            "W2": { name: "おもちゃの ハウス", message: "新しいゲームや可愛いぬいぐるみに会いにきてね！", url: "https://www.yahoo.co.jp" },
+            "W3": { name: "わくわく ライブラリー", message: "おもしろい絵本や図鑑がたくさん読めるよ！", url: "https://www.bing.com" },
+            "W4": { name: "もぐもぐ カフェ", message: "おいしいジュースとあま～いお菓子でひとやすみ！", url: "https://www.wikipedia.org" },
+            "U1": { name: "クラフト ルーム", message: "自分だけの素敵な工作をいっしょに作ろう！", url: "https://www.google.com" },
+            "U2": { name: "どうぶつ パーク", message: "かわいい動物たちといつでも仲良くなれる場所だよ！", url: "https://www.yahoo.co.jp" },
+            "U3": { name: "デジタル スタジオ", message: "最新のテクノロジーを使った面白い体験ができるよ！", url: "https://www.bing.com" },
+            "U4": { name: "みらい スクエア", message: "みんなで元気に走り回って遊べる広い広場だよ！", url: "https://www.wikipedia.org" }
+        },
+        en: {
+            "W1": { name: "City of Kitakyushu Kodomo no Yakata", message: "An indoor play facility packed with fun for kids! ♪", url: "https://www.kodomo-how.com/" },
+            "W2": { name: "Toy House", message: "Come and see new games and cute stuffed animals!", url: "https://www.yahoo.co.jp" },
+            "W3": { name: "Wakuwaku Library", message: "You can read lots of interesting picture books!", url: "https://www.bing.com" },
+            "W4": { name: "Mogumogu Cafe", message: "Take a break with delicious juice and sweet treats!", url: "https://www.wikipedia.org" },
+            "U1": { name: "Craft Room", message: "Let's make wonderful crafts together!", url: "https://www.google.com" },
+            "U2": { name: "Animal Park", message: "A place where you can always befriend cute animals!", url: "https://www.yahoo.co.jp" },
+            "U3": { name: "Digital Studio", message: "Enjoy fun experiences using the latest technology!", url: "https://www.bing.com" },
+            "U4": { name: "Mirai Square", message: "A wide open space where everyone can run and play!", url: "https://www.wikipedia.org" }
+        },
+        zh: {
+            "W1": { name: "北九州市立儿童之馆", message: "充满孩子们快乐的室内游乐设施♪", url: "https://www.kodomo-how.com/" },
+            "W2": { name: "玩具小屋", message: "快来瞧瞧新游戏和可爱的毛绒玩具吧！", url: "https://www.yahoo.co.jp" },
+            "W3": { name: "Wakuwaku 图书馆", message: "这里可以阅读到许多有趣的绘本哦！", url: "https://www.bing.com" },
+            "W4": { name: "Mogumogu 咖啡厅", message: "喝杯美味的果汁，吃点甜点休息一下吧！", url: "https://www.wikipedia.org" },
+            "U1": { name: "手工坊", message: "让我们一起制作精美的手工作品吧！", url: "https://www.google.com" },
+            "U2": { name: "动物乐园", message: "一个随时可以和可爱动物交朋友的地方！", url: "https://www.yahoo.co.jp" },
+            "U3": { name: "数字工作室", message: "体验利用最新技术带来的有趣互动吧！", url: "https://www.bing.com" },
+            "U4": { name: "未来广场", message: "一个可以让大家尽情奔跑玩耍的宽敞广场！", url: "https://www.wikipedia.org" }
+        },
+        ko: {
+            "W1": { name: "기타큐슈 시립 어린이의 집", message: "아이들의 즐거움이 가득 찬 실내 놀이 시설♪", url: "https://www.kodomo-how.com/" },
+            "W2": { name: "장난감 하우스", message: "새로운 게임과 귀여운 인형들을 만나러 오세요!", url: "https://www.yahoo.co.jp" },
+            "W3": { name: "와쿠와쿠 라이브러리", message: "재미있는 그림책을 많이 읽을 수 있어요!", url: "https://www.bing.com" },
+            "W4": { name: "모구모구 카페", message: "맛있는 주스와 달콤한 과자로 잠시 쉬어가세요!", url: "https://www.wikipedia.org" },
+            "U1": { name: "크래프트 룸", message: "나만의 멋진 공작품을 함께 만들어 봐요!", url: "https://www.google.com" },
+            "U2": { name: "동물 파크", message: "귀여운 동물 친구들과 언제나 친해질 수 있는 곳이에요!", url: "https://www.yahoo.co.jp" },
+            "U3": { name: "디지털 스튜디오", message: "최신 기술을 사용한 재미있는 체험을 할 수 있어요!", url: "https://www.bing.com" },
+            "U4": { name: "미래 스퀘어", message: "모두 함께 신나게 뛰어놀 수 있는 넓은 광장입니다!", url: "https://www.wikipedia.org" }
+        }
     };
 
     // --- 各スポットの「場所ヒント」データ ---
     const hintTexts = {
         ja: {
-            "W1": "🔍【W1のヒント】入口のちかく、大きな看板（かんばん）のしたにあるよ！",
+            "W1": "🔍【W1のヒント】赤のエレベーターで7階へ！子どもの館の受付近くにあるよ♪",
             "W2": "🔍【W2のヒント】エレベーターをおりて、右がわに進んだお店だよ！",
             "W3": "🔍【W3のヒント】みんなが大好きな、おもちゃコーナーの奥（おく）にあります！",
             "W4": "🔍【W4のヒント】休憩（きゅうけい）スペースの、自動販売機のよこだよ！",
@@ -369,7 +416,7 @@
             "U4": "🔍【U4のヒント】出口の手前、ガチャガチャがたくさん並んでいるところだよ！"
         },
         en: {
-            "W1": "🔍 [W1 Hint] Located near the entrance, right under the big sign!",
+            "W1": "🔍 [W1 Hint] Take the red elevator to the 7th floor! It's near the reception of the Children's Hall♪",
             "W2": "🔍 [W2 Hint] Take the elevator down and walk to the shop on your right!",
             "W3": "🔍 [W3 Hint] Located in the back of everyone's favorite toy corner!",
             "W4": "🔍 [W4 Hint] Right next to the vending machines in the rest area!",
@@ -379,7 +426,7 @@
             "U4": "🔍 [U4 Hint] Right before the exit, where all the capsule toy machines are!"
         },
         zh: {
-            "W1": "🔍【W1 提示】就在入口附近，大招牌的正下方！",
+            "W1": "🔍【W1 提示】搭乘红色电梯到7楼！就在儿童之馆的接待处附近♪",
             "W2": "🔍【W2 提示】走下电梯后，向右手边的店铺走去！",
             "W3": "🔍【W3 提示】位于大家最喜欢的玩具专区最里面！",
             "W4": "🔍【W4 提示】在休息区的自动售货机旁边！",
@@ -389,7 +436,7 @@
             "U4": "🔍【U4 提示】就在出口前，摆放着很多扭蛋机的地方！"
         },
         ko: {
-            "W1": "🔍【W1 힌트】입구 근처, 큰 간판 바로 아래에 있어요!",
+            "W1": "🔍【W1 힌트】빨간색 엘리베이터를 타고 7층으로! 어린이의 집 접수처 근처에 있어요♪",
             "W2": "🔍【W2 힌트】엘리베이터에서 내려 오른쪽으로 가시면 있는 매장입니다!",
             "W3": "🔍【W3 힌트】모두가 좋아하는 장난감 코너 안쪽에 있습니다!",
             "W4": "🔍【W4 힌트】휴게 공간에 있는 자동판매기 바로 옆이에요!",
@@ -400,7 +447,7 @@
         }
     };
 
-    // --- 翻訳データ（その他UI・案内文含む） ---
+    // --- 翻訳データ（その他UI） ---
     const i18n = {
         ja: {
             title: "わくわく スタンプラリー",
@@ -409,11 +456,11 @@
             courseW: "わくわくコース",
             courseU: "うきうきコース",
             hint: "QRコードをよみとってスタンプをあつめよう！",
-            getSuccess: "🎉【{spot}】ゲット！<br><span style='font-size:12px; font-weight:normal;'>スタンプをタップすると施設サイトへ移動します</span>",
             clearW: "<strong>わくわくコースクリア！景品をもらってね！</strong>",
             reset: "リセット",
             btnNormal: "👁️ みやすさ：通常（カラー）",
-            btnHigh: "👁️ みやすさ：はっきり（白黒）"
+            btnHigh: "👁️ みやすさ：はっきり（白黒）",
+            goWeb: "ホームページをみる 🔗"
         },
         en: {
             title: "Exciting Stamp Rally",
@@ -422,11 +469,11 @@
             courseW: "Wakuwaku Course",
             courseU: "Ukiuki Course",
             hint: "Scan QR codes to collect stamps!",
-            getSuccess: "🎉【{spot}】Got! <br><span style='font-size:12px; font-weight:normal;'>Tap the stamp to visit the website</span>",
             clearW: "<strong>Wakuwaku Course Complete! Get your prize!</strong>",
             reset: "Reset",
             btnNormal: "👁️ View: Normal (Color)",
-            btnHigh: "👁️ View: High Contrast"
+            btnHigh: "👁️ View: High Contrast",
+            goWeb: "Visit Website 🔗"
         },
         zh: {
             title: "集章拉力赛",
@@ -435,11 +482,11 @@
             courseW: "Wakuwaku 路线",
             courseU: "Ukiuki 路线",
             hint: "扫描QR码来收集印章！",
-            getSuccess: "🎉【{spot}】成功！<br><span style='font-size:12px; font-weight:normal;'>点击印章访问官方网站</span>",
             clearW: "<strong>Wakuwaku 路线完成！快来领取奖品吧！</strong>",
             reset: "重置",
             btnNormal: "👁️ 视角: 普通（彩色）",
-            btnHigh: "👁️ 视角: 高对比度（黑白）"
+            btnHigh: "👁️ 视角: 高对比度（黑白）",
+            goWeb: "访问官方网站 🔗"
         },
         ko: {
             title: "두근두근 스탬프 랠리",
@@ -448,19 +495,19 @@
             courseW: "와쿠와쿠 코스",
             courseU: "우키우키 코스",
             hint: "QR 코드를 스캔하여 스탬프를 모으세요!",
-            getSuccess: "🎉【{spot}】획득!<br><span style='font-size:12px; font-weight:normal;'>스탬프를 탭하면 시설 사이트로 이동합니다</span>",
             clearW: "<strong>와쿠와쿠 코스 클리어! 경품을 받으세요!</strong>",
             reset: "리셋",
             btnNormal: "👁️ 보기: 일반 (컬러)",
-            btnHigh: "👁️ 보기: 고대비 (흑백)"
+            btnHigh: "👁️ 보기: 고대비 (흑백)",
+            goWeb: "홈페이지 보기 🔗"
         }
     };
 
     let currentLang = 'ja';
     let isHighContrast = false;
-    let lastActiveSpot = null;
-    let currentShowingHintSpot = null;
-    let isCleared = false;
+    let lastActiveSpot = null;          
+    let isCleared = false;              
+    const collectedSpots = new Set();  
 
     function switchLang(lang) {
         currentLang = lang;
@@ -475,18 +522,37 @@
         document.getElementById('titleU').innerText = i18n[lang].courseU;
         document.getElementById('resetBtn').innerText = i18n[lang].reset;
         
-        const statusEl = document.getElementById('statusMsg');
-        if (isCleared) {
-            statusEl.innerHTML = i18n[lang].clearW;
-        } else if (currentShowingHintSpot) {
-            statusEl.innerText = hintTexts[lang][currentShowingHintSpot];
-        } else if (lastActiveSpot) {
-            statusEl.innerHTML = i18n[lang].getSuccess.replace('{spot}', lastActiveSpot);
-        } else {
-            statusEl.innerText = i18n[lang].hint;
-        }
-        
+        updateMessageArea();
         updateContrastButtonText();
+    }
+
+    function updateMessageArea() {
+        const statusEl = document.getElementById('statusMsg');
+        
+        if (isCleared) {
+            statusEl.innerHTML = i18n[currentLang].clearW;
+            return;
+        }
+
+        if (lastActiveSpot) {
+            if (collectedSpots.has(lastActiveSpot)) {
+                const detail = spotDetails[currentLang][lastActiveSpot];
+                statusEl.innerHTML = `
+                    <div><strong>🎉【${detail.name}】GET!</strong></div>
+                    <div style="font-size: 13px; font-weight: normal; color: #666; margin: 2px 0;">${detail.message}</div>
+                    <a href="${detail.url}" target="_blank" class="facility-link-btn">${i18n[currentLang].goWeb}</a>
+                `;
+            } else {
+                statusEl.innerText = hintTexts[currentLang][lastActiveSpot];
+            }
+        } else {
+            statusEl.innerText = i18n[currentLang].hint;
+        }
+    }
+
+    function handleSlotClick(spotCode) {
+        lastActiveSpot = spotCode;
+        updateMessageArea();
     }
 
     function toggleContrast() {
@@ -508,15 +574,6 @@
         }
     }
 
-    function showHint(spotCode) {
-        const slot = document.getElementById(`slot-${spotCode}`);
-        if (slot && !slot.querySelector('img')) {
-            lastActiveSpot = null;
-            currentShowingHintSpot = spotCode;
-            document.getElementById('statusMsg').innerText = hintTexts[currentLang][spotCode];
-        }
-    }
-
     // --- 【打合せデモ用ロジック】 ---
     let demoIndex = 0;
     const demoSpots = ["W1", "W2", "W3", "W4", "U1"];
@@ -534,30 +591,23 @@
 
     function stampPressed(spotCode) {
         const slot = document.getElementById(`slot-${spotCode}`);
-        if (slot && !slot.querySelector('img')) {
-            const destinationUrl = spotLinks[spotCode] || "#";
-            
-            slot.removeAttribute('onclick');
-            
-            slot.innerHTML = `
-                <a href="${destinationUrl}" target="_blank" class="stamp-link">
-                    <img src="HOW_logo_W1.png" class="stamp-image" alt="${spotCode}">
-                </a>
-            `;
-            
-            currentShowingHintSpot = null;
-            lastActiveSpot = spotCode; 
-            document.getElementById('statusMsg').innerHTML = i18n[currentLang].getSuccess.replace('{spot}', spotCode);
+        if (slot && !collectedSpots.has(spotCode)) {
+            collectedSpots.add(spotCode);
+            slot.innerHTML = `<img src="HOW_logo_W1.png" class="stamp-image" alt="${spotCode}">`;
+            lastActiveSpot = spotCode;
+            updateMessageArea();
             checkGoal();
         }
     }
 
     function checkGoal() {
-        const wCount = document.querySelectorAll('.course-w .stamp-image').length;
-        if (wCount === 4) {
+        const wSpots = ["W1", "W2", "W3", "W4"];
+        const isWComplete = wSpots.every(spot => collectedSpots.has(spot));
+        
+        if (isWComplete) {
             isCleared = true;
             document.getElementById('slot-W-goal').innerText = "🎉";
-            document.getElementById('statusMsg').innerHTML = i18n[currentLang].clearW;
+            updateMessageArea();
         }
     }
 
