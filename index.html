@@ -91,6 +91,7 @@
             margin-bottom: 20px;
             color: #665544;
             line-height: 1.5;
+            text-align: left; /* 先着案内を読みやすくするため左寄せに調整 */
         }
         
         /* スキャンボタン */
@@ -161,12 +162,14 @@
             position: relative;
             flex-shrink: 0;
             box-sizing: border-box;
+            cursor: pointer;
         }
         .stamp-slot.goal {
             border: 2px dashed #fbbf24;
             background-color: #fffdf5;
             color: #fbbf24;
             font-size: 16px;
+            cursor: default;
         }
         
         /* 押されたスタンプ（リンクの入る枠） */
@@ -191,6 +194,11 @@
             font-weight: bold;
             margin-top: 10px;
             border: 1px solid #e5e7eb;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
         .reset-btn {
             background-color: transparent;
@@ -203,7 +211,7 @@
             margin-top: 15px;
         }
 
-        /* --- 👁️‍🗨️ 高コントラストモードスタイル --- */
+        /* --- 👁️ 高コントラストモードスタイル --- */
         body.high-contrast {
             background-color: #000000 !important;
             color: #ffffff !important;
@@ -275,12 +283,13 @@
 <body>
 
 <div class="container">
+    <!-- コントロールパネル -->
     <div class="control-panel">
         <div class="lang-buttons">
-            <button class="lang-btn active" onclick="switchLang('ja')">日本語</button>
-            <button class="lang-btn" onclick="switchLang('en')">English</button>
-            <button class="lang-btn" onclick="switchLang('zh')">中文</button>
-            <button class="lang-btn" onclick="switchLang('ko')">한국어</button>
+            <button class="lang-btn active" id="btn-ja" onclick="switchLang('ja')">日本語</button>
+            <button class="lang-btn" id="btn-en" onclick="switchLang('en')">English</button>
+            <button class="lang-btn" id="btn-zh" onclick="switchLang('zh')">中文</button>
+            <button class="lang-btn" id="btn-ko" onclick="switchLang('ko')">한국어</button>
         </div>
         
         <div class="accessibility-box">
@@ -293,36 +302,40 @@
     <h1 id="mainTitle">わくわく スタンプラリー</h1>
     
     <div class="info-text" id="infoText">
-        下のボタンをおして、お店のQRコードをよみとろう！<br>
-        スタンプをあつめると、各施設（しせつ）のホームページが見られるよ！
+        QRコードを読み取るとスタンプGET！<br>
+        ゴール特典の景品は先着〇〇名様となります。無くなり次第終了となりますのでご了承ください。
     </div>
 
+    <!-- スキャン起動ボタン -->
     <button class="scan-btn" onclick="simulateScan()">
         📷 <span id="scanBtnText">QRコードをよみとる</span>
     </button>
 
+    <!-- わくわくコース (W) -->
     <div class="course-section course-w">
         <div class="course-title">🟢 <span id="titleW">わくわくコース</span></div>
         <div class="stamp-grid">
-            <div class="stamp-slot" id="slot-W1">W1</div>
-            <div class="stamp-slot" id="slot-W2">W2</div>
-            <div class="stamp-slot" id="slot-W3">W3</div>
-            <div class="stamp-slot" id="slot-W4">W4</div>
+            <div class="stamp-slot" id="slot-W1" onclick="showHint('W1')">W1</div>
+            <div class="stamp-slot" id="slot-W2" onclick="showHint('W2')">W2</div>
+            <div class="stamp-slot" id="slot-W3" onclick="showHint('W3')">W3</div>
+            <div class="stamp-slot" id="slot-W4" onclick="showHint('W4')">W4</div>
             <div class="stamp-slot goal" id="slot-W-goal">★</div>
         </div>
     </div>
 
+    <!-- うきうきコース (U) -->
     <div class="course-section course-u">
         <div class="course-title">🔵 <span id="titleU">うきうきコース</span></div>
         <div class="stamp-grid">
-            <div class="stamp-slot" id="slot-U1">U1</div>
-            <div class="stamp-slot" id="slot-U2">U2</div>
-            <div class="stamp-slot" id="slot-U3">U3</div>
-            <div class="stamp-slot" id="slot-U4">U4</div>
+            <div class="stamp-slot" id="slot-U1" onclick="showHint('U1')">U1</div>
+            <div class="stamp-slot" id="slot-U2" onclick="showHint('U2')">U2</div>
+            <div class="stamp-slot" id="slot-U3" onclick="showHint('U3')">U3</div>
+            <div class="stamp-slot" id="slot-U4" onclick="showHint('U4')">U4</div>
             <div class="stamp-slot goal" id="slot-U-goal">★</div>
         </div>
     </div>
 
+    <!-- 状態メッセージ -->
     <div class="status-msg" id="statusMsg">
         QRコードをよみとってスタンプをあつめよう！
     </div>
@@ -331,8 +344,7 @@
 </div>
 
 <script>
-    // --- 各スポットの施設ホームページURL（設定） ---
-    // 打合せ用に仮のURL（例としてGoogleやYahooなど）を入れています。本番用に書き換え可能です。
+    // --- 各スポットの施設ホームページURL ---
     const spotLinks = {
         "W1": "https://www.google.com",
         "W2": "https://www.yahoo.co.jp",
@@ -344,48 +356,100 @@
         "U4": "https://www.wikipedia.org"
     };
 
-    // --- 翻訳データ ---
+    // --- 各スポットの「場所ヒント」データ ---
+    const hintTexts = {
+        ja: {
+            "W1": "🔍【W1のヒント】入口のちかく、大きな看板（かんばん）のしたにあるよ！",
+            "W2": "🔍【W2のヒント】エレベーターをおりて、右がわに進んだお店だよ！",
+            "W3": "🔍【W3のヒント】みんなが大好きな、おもちゃコーナーの奥（おく）にあります！",
+            "W4": "🔍【W4のヒント】休憩（きゅうけい）スペースの、自動販売機のよこだよ！",
+            "U1": "🔍【U1のヒント】インフォメーションセンターのすぐ裏がわだよ！",
+            "U2": "🔍【U2のヒント】絵本（えほん）がたくさんならんでいるお部屋の入り口だよ！",
+            "U3": "🔍【U3のヒント】授乳室（じゅにゅうしつ）やトイレのちかくの通路（つうろ）だよ！",
+            "U4": "🔍【U4のヒント】出口の手前、ガチャガチャがたくさん並んでいるところだよ！"
+        },
+        en: {
+            "W1": "🔍 [W1 Hint] Located near the entrance, right under the big sign!",
+            "W2": "🔍 [W2 Hint] Take the elevator down and walk to the shop on your right!",
+            "W3": "🔍 [W3 Hint] Located in the back of everyone's favorite toy corner!",
+            "W4": "🔍 [W4 Hint] Right next to the vending machines in the rest area!",
+            "U1": "🔍 [U1 Hint] Located right behind the Information Center!",
+            "U2": "🔍 [U2 Hint] At the entrance of the room filled with many picture books!",
+            "U3": "🔍 [U3 Hint] In the aisle near the nursing room and restrooms!",
+            "U4": "🔍 [U4 Hint] Right before the exit, where all the capsule toy machines are!"
+        },
+        zh: {
+            "W1": "🔍【W1 提示】就在入口附近，大招牌的正下方！",
+            "W2": "🔍【W2 提示】走下电梯后，向右手边的店铺走去！",
+            "W3": "🔍【W3 提示】位于大家最喜欢的玩具专区最里面！",
+            "W4": "🔍【W4 提示】在休息区的自动售货机旁边！",
+            "U1": "🔍【U1 提示】就在问询处（Information Center）的正后方！",
+            "U2": "🔍【U2 提示】在摆满许多绘本的房间入口处！",
+            "U3": "🔍【U3 提示】在哺乳室和洗手间附近的通道上！",
+            "U4": "🔍【U4 提示】就在出口前，摆放着很多扭蛋机的地方！"
+        },
+        ko: {
+            "W1": "🔍【W1 힌트】입구 근처, 큰 간판 바로 아래에 있어요!",
+            "W2": "🔍【W2 힌트】엘리베이터에서 내려 오른쪽으로 가시면 있는 매장입니다!",
+            "W3": "🔍【W3 힌트】모두가 좋아하는 장난감 코너 안쪽에 있습니다!",
+            "W4": "🔍【W4 힌트】휴게 공간에 있는 자동판매기 바로 옆이에요!",
+            "U1": "🔍【U1 힌트】안내소(인포메이션 센터) 바로 뒷방향에 있습니다!",
+            "U2": "🔍【U2 힌트】그림책이 많이 진열되어 있는 방 입구에 있어요!",
+            "U3": "🔍【U3 힌트】수유실과 화장실 근처 통로에 있습니다!",
+            "U4": "🔍【U4 힌트】출구 직전, 캡슐토이 기계가 많이 나열된 곳입니다!"
+        }
+    };
+
+    // --- 翻訳データ（その他UI・案内文含む） ---
     const i18n = {
         ja: {
             title: "わくわく スタンプラリー",
-            info: "下のボタンをおして、お店のQRコードをよみとろう！<br>スタンプをあつめると、各施設（しせつ）のホームページが見られるよ！",
+            info: "QRコードを読み取るとスタンプGET！<br>ゴール特典の景品は先着〇〇名様となります。無くなり次第終了となりますのでご了承ください。",
             scan: "QRコードをよみとる",
             courseW: "わくわくコース",
             courseU: "うきうきコース",
             hint: "QRコードをよみとってスタンプをあつめよう！",
+            getSuccess: "🎉【{spot}】ゲット！<br><span style='font-size:12px; font-weight:normal;'>スタンプをタップすると施設サイトへ移動します</span>",
+            clearW: "<strong>わくわくコースクリア！景品をもらってね！</strong>",
             reset: "リセット",
             btnNormal: "👁️ みやすさ：通常（カラー）",
             btnHigh: "👁️ みやすさ：はっきり（白黒）"
         },
         en: {
             title: "Exciting Stamp Rally",
-            info: "Tap the button below to scan the shop's QR code!<br>Collect stamps to view each facility's website!",
+            info: "Scan the QR code to GET a stamp!<br>Goal prizes are available for the first OO visitors on a first-come, first-served basis. Please note that the event will end as soon as prizes run out.",
             scan: "Scan QR Code",
             courseW: "Wakuwaku Course",
             courseU: "Ukiuki Course",
             hint: "Scan QR codes to collect stamps!",
+            getSuccess: "🎉【{spot}】Got! <br><span style='font-size:12px; font-weight:normal;'>Tap the stamp to visit the website</span>",
+            clearW: "<strong>Wakuwaku Course Complete! Get your prize!</strong>",
             reset: "Reset",
             btnNormal: "👁️ View: Normal (Color)",
             btnHigh: "👁️ View: High Contrast"
         },
         zh: {
             title: "集章拉力赛",
-            info: "点击下方按钮扫描商家QR码！<br>集齐印章即可查看各设施的官方网站！",
+            info: "扫描QR码即可获得印章！<br>终点奖品数量有限（先到先得前〇〇名）。奖品发完即止，敬请谅解。",
             scan: "扫描QR码",
             courseW: "Wakuwaku 路线",
             courseU: "Ukiuki 路线",
             hint: "扫描QR码来收集印章！",
+            getSuccess: "🎉【{spot}】成功！<br><span style='font-size:12px; font-weight:normal;'>点击印章访问官方网站</span>",
+            clearW: "<strong>Wakuwaku 路线完成！快来领取奖品吧！</strong>",
             reset: "重置",
             btnNormal: "👁️ 视角: 普通（彩色）",
             btnHigh: "👁️ 视角: 高对比度（黑白）"
         },
         ko: {
-            title: "두근두근 스탬프 랠り",
-            info: "아래 버튼을 눌러 매장의 QR 코드를 스캔하세요!<br>스탬프를 모으면 각 시설의 홈페이지를 볼 수 있습니다!",
+            title: "두근두근 스탬프 랠리",
+            info: "QR 코드를 스캔하면 스탬프 GET!<br>골 달성 사은품은 선착순 OO명 한정입니다. 사은품이 소진되는 대로 종료되오니 양해 바랍니다.",
             scan: "QR 코드 스캔",
             courseW: "와쿠와쿠 코스",
             courseU: "우키우키 코스",
             hint: "QR 코드를 스캔하여 스탬프를 모으세요!",
+            getSuccess: "🎉【{spot}】획득!<br><span style='font-size:12px; font-weight:normal;'>스탬프를 탭하면 시설 사이트로 이동합니다</span>",
+            clearW: "<strong>와쿠와쿠 코스 클리어! 경품을 받으세요!</strong>",
             reset: "리셋",
             btnNormal: "👁️ 보기: 일반 (컬러)",
             btnHigh: "👁️ 보기: 고대비 (흑백)"
@@ -394,19 +458,33 @@
 
     let currentLang = 'ja';
     let isHighContrast = false;
+    let lastActiveSpot = null;
+    let currentShowingHintSpot = null;
+    let isCleared = false;
 
     function switchLang(lang) {
         currentLang = lang;
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        const activeBtn = document.getElementById(`btn-${lang}`);
+        if(activeBtn) activeBtn.classList.add('active');
 
         document.getElementById('mainTitle').innerText = i18n[lang].title;
         document.getElementById('infoText').innerHTML = i18n[lang].info;
         document.getElementById('scanBtnText').innerText = i18n[lang].scan;
         document.getElementById('titleW').innerText = i18n[lang].courseW;
         document.getElementById('titleU').innerText = i18n[lang].courseU;
-        document.getElementById('statusMsg').innerText = i18n[lang].hint;
         document.getElementById('resetBtn').innerText = i18n[lang].reset;
+        
+        const statusEl = document.getElementById('statusMsg');
+        if (isCleared) {
+            statusEl.innerHTML = i18n[lang].clearW;
+        } else if (currentShowingHintSpot) {
+            statusEl.innerText = hintTexts[lang][currentShowingHintSpot];
+        } else if (lastActiveSpot) {
+            statusEl.innerHTML = i18n[lang].getSuccess.replace('{spot}', lastActiveSpot);
+        } else {
+            statusEl.innerText = i18n[lang].hint;
+        }
         
         updateContrastButtonText();
     }
@@ -430,9 +508,16 @@
         }
     }
 
+    function showHint(spotCode) {
+        const slot = document.getElementById(`slot-${spotCode}`);
+        if (slot && !slot.querySelector('img')) {
+            lastActiveSpot = null;
+            currentShowingHintSpot = spotCode;
+            document.getElementById('statusMsg').innerText = hintTexts[currentLang][spotCode];
+        }
+    }
+
     // --- 【打合せデモ用ロジック】 ---
-    // 本番はQRコードを読み取った際に、そのスポットのコード（W1など）が自動で stampPressed() に渡されます。
-    // 今回はデモボタンを押すたびに、W1 → W2 → W3... と順番に疑似スキャンが進むようにしました。
     let demoIndex = 0;
     const demoSpots = ["W1", "W2", "W3", "W4", "U1"];
 
@@ -447,21 +532,22 @@
         }
     }
 
-    // ※マスを直接タップする「テスト用タップ機能」は完全に削除しました。
-
-    // スタンプを押す処理（施設ホームページのリンクを埋め込む）
     function stampPressed(spotCode) {
         const slot = document.getElementById(`slot-${spotCode}`);
         if (slot && !slot.querySelector('img')) {
             const destinationUrl = spotLinks[spotCode] || "#";
             
-            // マスの中に、施設サイトへのリンク付きで画像を埋め込みます
+            slot.removeAttribute('onclick');
+            
             slot.innerHTML = `
                 <a href="${destinationUrl}" target="_blank" class="stamp-link">
                     <img src="HOW_logo_W1.png" class="stamp-image" alt="${spotCode}">
                 </a>
             `;
-            document.getElementById('statusMsg').innerHTML = `🎉【${spotCode}】ゲット！<br><span style="font-size:12px; font-weight:normal;">スタンプをタップすると施設サイトへ移動します</span>`;
+            
+            currentShowingHintSpot = null;
+            lastActiveSpot = spotCode; 
+            document.getElementById('statusMsg').innerHTML = i18n[currentLang].getSuccess.replace('{spot}', spotCode);
             checkGoal();
         }
     }
@@ -469,8 +555,9 @@
     function checkGoal() {
         const wCount = document.querySelectorAll('.course-w .stamp-image').length;
         if (wCount === 4) {
+            isCleared = true;
             document.getElementById('slot-W-goal').innerText = "🎉";
-            document.getElementById('statusMsg').innerHTML = "<strong>わくわくコースクリア！景品をもらってね！</strong>";
+            document.getElementById('statusMsg').innerHTML = i18n[currentLang].clearW;
         }
     }
 
@@ -479,7 +566,8 @@
         location.reload();
     }
 
-    updateContrastButtonText();
+    // 初期化
+    switchLang('ja');
 </script>
 
 </body>
