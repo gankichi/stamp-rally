@@ -92,6 +92,50 @@
             text-align: left;
         }
 
+        /* 📷 カメラエリア（追加） */
+        .scan-btn {
+            background-color: #ff5a5f;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(255, 90, 95, 0.4);
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .camera-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 20px auto;
+            border: 3px solid #ff5a5f;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #000;
+        }
+        #video-preview {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            border: 2px dashed #ff5a5f;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
         /* コースエリア */
         .course-section {
             border-radius: 15px;
@@ -148,7 +192,6 @@
             cursor: default;
         }
         
-        /* スタンプ画像・および汎用スタンプデザイン */
         .stamp-image {
             width: 100%;
             height: 100%;
@@ -217,6 +260,9 @@
         body.high-contrast .lang-btn.active { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #ffffff !important; }
         body.high-contrast h1 { color: #ffffff !important; font-weight: 900 !important; }
         body.high-contrast .info-text { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
+        body.high-contrast .scan-btn { background-color: #ffffff !important; color: #000000 !important; border: 4px solid #ffffff !important; }
+        body.high-contrast .camera-container { border: 4px solid #ffffff !important; }
+        body.high-contrast .camera-overlay { border: 3px dashed #ffffff !important; }
         body.high-contrast .course-section { background-color: #000000 !important; border: 4px solid #ffffff !important; }
         body.high-contrast .course-title { color: #ffffff !important; font-size: 22px !important; }
         body.high-contrast .stamp-slot { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; width: 65px !important; height: 65px !important; font-size: 16px !important; }
@@ -231,7 +277,6 @@
 <body>
 
 <div class="container">
-    <!-- コントロールパネル -->
     <div class="control-panel">
         <div class="lang-buttons">
             <button class="lang-btn active" id="btn-ja" onclick="switchLang('ja')">日本語</button>
@@ -253,7 +298,14 @@
         ゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。
     </div>
 
-    <!-- わくわくコース (W) -->
+    <button class="scan-btn" onclick="toggleCamera()" id="scanBtn">
+        📷 <span id="scanBtnText">QRコードを読み取る</span>
+    </button>
+    <div class="camera-container" id="cameraArea">
+        <video id="video-preview" autoplay playsinline></video>
+        <div class="camera-overlay"></div>
+    </div>
+
     <div class="course-section course-w">
         <div class="course-title">🟢 <span id="titleW">わくわくコース</span></div>
         <div class="stamp-grid">
@@ -265,7 +317,6 @@
         </div>
     </div>
 
-    <!-- うきうきコース (U) -->
     <div class="course-section course-u">
         <div class="course-title">🔵 <span id="titleU">うきうきコース</span></div>
         <div class="stamp-grid">
@@ -277,7 +328,6 @@
         </div>
     </div>
 
-    <!-- メッセージ表示エリア -->
     <div class="status-msg" id="statusMsg">
         QRコードをよみとってスタンプをあつめよう！
     </div>
@@ -288,21 +338,12 @@
 <script>
     // ==========================================
     // ⚙️ 本番用マスタデータ設定エリア
-    // 各施設の情報が確定したら、ここを書き換えます
     // ==========================================
     const spotMaster = {
-        // 施設個別のスタンプ画像パス（未定の場合は null にしておくと汎用スタンプになります）
         images: {
             "W1": "HOW_logo_W1.png", // 子どもの館（確定）
-            "W2": null,             // 以下、データ未着のためnull
-            "W3": null,
-            "W4": null,
-            "U1": null,
-            "U2": null,
-            "U3": null,
-            "U4": null
+            "W2": null, "W3": null, "W4": null, "U1": null, "U2": null, "U3": null, "U4": null
         },
-        // 多言語テキストマスタ
         languages: {
             ja: {
                 spots: {
@@ -311,13 +352,15 @@
                     "W3": { name: "施設W3（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W3のヒント】施設W3の場所のヒントがここに入ります。" },
                     "W4": { name: "施設W4（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W4のヒント】施設W4の場所のヒントがここに入ります。" },
                     "U1": { name: "施設U1（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U1のヒント】施設U1の場所のヒントがここに入ります。" },
-                    "U2": { name: "施設U2（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U2のヒント】施設U2の場所のヒントがここに入ります。" },
+                    "U2": { name: "施設U2（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U2のヒント】施設U2의の場所のヒントがここに入ります。" },
                     "U3": { name: "施設U3（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U3のヒント】施設U3の場所のヒントがここに入ります。" },
                     "U4": { name: "施設U4（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U4のヒント】施設U4の場所のヒントがここに入ります。" }
                 },
                 ui: {
                     title: "わくわく スタンプラリー",
                     info: "各スポットにあるQRコードを読み取るとスタンプが押されるよ！<br>ゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。",
+                    scanBtnStart: "QRコードを読み取る",
+                    scanBtnStop: "カメラを閉じる",
                     courseW: "わくわくコース",
                     courseU: "うきうきコース",
                     defaultHint: "QRコードをよみとってスタンプをあつめよう！",
@@ -332,17 +375,19 @@
             en: {
                 spots: {
                     "W1": { name: "City of Kitakyushu Kodomo no Yakata", message: "An indoor play facility packed with fun for kids! ♪", url: "https://www.kodomo-how.com/", hint: "🔍 [W1 Hint] Take the red elevator to the 7th floor! Near the reception♪" },
-                    "W2": { name: "Facility W2 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W2 Hint] Location hint will be placed here." },
-                    "W3": { name: "Facility W3 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W3 Hint] Location hint will be placed here." },
-                    "W4": { name: "Facility W4 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W4 Hint] Location hint will be placed here." },
-                    "U1": { name: "Facility U1 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U1 Hint] Location hint will be placed here." },
-                    "U2": { name: "Facility U2 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U2 Hint] Location hint will be placed here." },
-                    "U3": { name: "Facility U3 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U3 Hint] Location hint will be placed here." },
-                    "U4": { name: "Facility U4 (TBD)", message: "Facility description will be placed here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U4 Hint] Location hint will be placed here." }
+                    "W2": { name: "Facility W2 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W2 Hint] Location hint here." },
+                    "W3": { name: "Facility W3 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W3 Hint] Location hint here." },
+                    "W4": { name: "Facility W4 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W4 Hint] Location hint here." },
+                    "U1": { name: "Facility U1 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U1 Hint] Location hint here." },
+                    "U2": { name: "Facility U2 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U2 Hint] Location hint here." },
+                    "U3": { name: "Facility U3 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U3 Hint] Location hint here." },
+                    "U4": { name: "Facility U4 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U4 Hint] Location hint here." }
                 },
                 ui: {
                     title: "Exciting Stamp Rally",
                     info: "Scan the QR code at each spot to get a stamp!<br>Goal prizes are limited and available on a first-come, first-served basis.",
+                    scanBtnStart: "Scan QR Code",
+                    scanBtnStop: "Close Camera",
                     courseW: "Wakuwaku Course",
                     courseU: "Ukiuki Course",
                     defaultHint: "Scan QR codes to collect stamps!",
@@ -357,21 +402,17 @@
             zh: {
                 spots: {
                     "W1": { name: "北九州市立儿童之馆", message: "充满孩子们快乐的室内游乐设施♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 提示】搭乘红色电梯到7楼！就在接待处附近♪" },
-                    "W2": { name: "设施 W2（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【W2 提示】此处将显示地点的提示信息。" },
-                    "W3": { name: "设施 W3（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【W3 提示】此处将显示地点的提示信息。" },
-                    "W4": { name: "设施 W4（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【W4 提示】此处将显示地点的提示信息。" },
-                    "U1": { name: "设施 U1（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【U1 提示】此处将显示地点的提示信息。" },
-                    "U2": { name: "设施 U2（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【U2 提示】此处将显示地点的提示信息。" },
-                    "U3": { name: "设施 U3（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【U3 提示】此处将显示地点的提示信息。" },
-                    "U4": { name: "设施 U4（暂定）", message: "此处将显示设施的介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【U4 提示】此处将显示地点的提示信息。" }
+                    "W2": { name: "设施 W2（暂定）", message: "介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【W2 提示】地点提示。" }
                 },
                 ui: {
                     title: "集章拉力赛",
-                    info: "扫描各景点的QR码即可获得印章！<br>终点奖品数量有限，先到先得，发完即止。",
+                    info: "扫描各景点的QR码即可获得印章！",
+                    scanBtnStart: "扫描QR码",
+                    scanBtnStop: "关闭相机",
                     courseW: "Wakuwaku 路线",
                     courseU: "Ukiuki 路线",
                     defaultHint: "扫描QR码来收集印章！",
-                    clearW: "<strong>Wakuwaku 路线完成！快来领取奖品吧！ 🎉</strong>",
+                    clearW: "<strong>Wakuwaku 路线完成！ 🎉</strong>",
                     reset: "重置",
                     btnNormal: "👁️ 视角: 普通（彩色）",
                     btnHigh: "👁️ 视角: 高对比度（黑白）",
@@ -382,21 +423,17 @@
             ko: {
                 spots: {
                     "W1": { name: "기타큐슈 시립 어린이의 집", message: "아이들의 즐거움이 가득 찬 실내 놀이 시설♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 힌트】빨간색 엘리베이터를 타고 7층으로! 접수처 근처에 있어요♪" },
-                    "W2": { name: "시설 W2 (미정)", message: "여기에 시설 소개 텍스트가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【W2 힌트】시설 위치 힌트가 여기에 들어갑니다." },
-                    "W3": { name: "시설 W3 (미정)", message: "여기에 시설 소개 텍換가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【W3 힌트】시설 위치 힌트가 여기에 들어갑니다." },
-                    "W4": { name: "시설 W4 (미정)", message: "여기에 시설 소개 텍스트가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【W4 힌트】시설 위치 힌트가 여기에 들어갑니다." },
-                    "U1": { name: "시설 U1 (미정)", message: "여기에 시설 소개 텍스트가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【U1 힌트】시설 위치 힌트가 여기에 들어갑니다." },
-                    "U2": { name: "시설 U2 (미정)", message: "여기에 시설 소개 텍스트가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【U2 힌트】시설 위치 힌트가 여기에 들어갑니다." },
-                    "U3": { name: "시설 U3 (미정)", message: "여기에 시설 소개 텍스트가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【U3 힌트】시설 위치 힌트가 여기에 들어갑니다." },
-                    "U4": { name: "시설 U4 (미정)", message: "여기에 시설 소개 텍스트가 들어갑니다.", url: "https://www.kodomo-how.com/", hint: "🔍【U4 힌트】시설 위치 힌트가 여기에 들어갑니다." }
+                    "W2": { name: "시설 W2 (미정)", message: "소개 텍스트.", url: "https://www.kodomo-how.com/", hint: "🔍【W2 힌트】위치 힌트." }
                 },
                 ui: {
                     title: "두근두근 스탬프 랠리",
-                    info: "각 스폿에 있는 QR 코드를 스캔하면 스탬프가 찍힙니다!<br>골 사은품은 선착순 한정이므로 소진되는 대로 종료됩니다.",
+                    info: "각 스폿에 있는 QR 코드를 스캔하면 스탬프가 찍힙니다!",
+                    scanBtnStart: "QR 코드 스캔",
+                    scanBtnStop: "카메라 닫기",
                     courseW: "와쿠와쿠 코스",
                     courseU: "우키우키 코스",
                     defaultHint: "QR 코드를 스캔하여 스탬프를 모으세요!",
-                    clearW: "<strong>와쿠와쿠 코스 클리어! 경품을 받으세요! 🎉</strong>",
+                    clearW: "<strong>와쿠와쿠 코스 클리어! 🎉</strong>",
                     reset: "다시 시작하기",
                     btnNormal: "👁️ 보기: 일반 (컬러)",
                     btnHigh: "👁️ 보기: 고대비 (흑백)",
@@ -407,13 +444,13 @@
         }
     };
 
-    // --- 本番内部ロジック ---
+    // --- 内部ロジック ---
     let currentLang = 'ja';
     let isHighContrast = false;
     let lastActiveSpot = null;          
     let collectedSpots = new Set();  
+    let videoStream = null;
 
-    // データのブラウザ読み込み (LocalStorage)
     function loadUserData() {
         const saved = localStorage.getItem('vaku_rally_data');
         if (saved) {
@@ -421,18 +458,12 @@
                 const parsed = JSON.parse(saved);
                 collectedSpots = new Set(parsed.spots || []);
                 lastActiveSpot = parsed.lastActive || null;
-            } catch(e) {
-                console.error("データ読み込みエラー", e);
-            }
+            } catch(e) {}
         }
     }
 
-    // データのブラウザ保存 (LocalStorage)
     function saveUserData() {
-        const data = {
-            spots: Array.from(collectedSpots),
-            lastActive: lastActiveSpot
-        };
+        const data = { spots: Array.from(collectedSpots), lastActive: lastActiveSpot };
         localStorage.setItem('vaku_rally_data', JSON.stringify(data));
     }
 
@@ -449,9 +480,20 @@
         document.getElementById('titleU').innerText = textUI.courseU;
         document.getElementById('resetBtn').innerText = textUI.reset;
         
+        updateScanButtonText();
         updateStampDisplayAll();
         updateMessageArea();
         updateContrastButtonText();
+    }
+
+    function updateScanButtonText() {
+        const textUI = spotMaster.languages[currentLang].ui;
+        const scanBtnText = document.getElementById('scanBtnText');
+        if (videoStream) {
+            scanBtnText.innerText = textUI.scanBtnStop;
+        } else {
+            scanBtnText.innerText = textUI.scanBtnStart;
+        }
     }
 
     function updateMessageArea() {
@@ -459,7 +501,6 @@
         const textUI = spotMaster.languages[currentLang].ui;
         const spotsData = spotMaster.languages[currentLang].spots;
         
-        // わくわくコースのクリア判定 (W1~W4が揃っているか)
         const wSpots = ["W1", "W2", "W3", "W4"];
         const isWComplete = wSpots.every(spot => collectedSpots.has(spot));
 
@@ -487,16 +528,14 @@
         }
     }
 
-    // スロットをクリックした時は「ヒント」を表示する仕様
     function handleSlotClick(spotCode) {
         lastActiveSpot = spotCode;
         updateMessageArea();
         saveUserData();
     }
 
-    // QR読取またはURLパラメータからスタンプを押す本番処理
     function processStampInbound(spotCode) {
-        if (!spotMaster.images.hasOwnProperty(spotCode)) return; // 存在しないコードは無視
+        if (!spotMaster.images.hasOwnProperty(spotCode)) return;
 
         if (!collectedSpots.has(spotCode)) {
             collectedSpots.add(spotCode);
@@ -507,7 +546,6 @@
         }
     }
 
-    // 特定のスタンプマスの見た目を更新
     function updateStampSlotVisual(spotCode) {
         const slot = document.getElementById(`slot-${spotCode}`);
         if (!slot) return;
@@ -515,10 +553,8 @@
         if (collectedSpots.has(spotCode)) {
             const imgPath = spotMaster.images[spotCode];
             if (imgPath) {
-                // 専用画像がある場合（子どもの館など）
                 slot.innerHTML = `<img src="${imgPath}" class="stamp-image" alt="${spotCode}">`;
             } else {
-                // 画像が未着（null）の場合：他施設の画像を流用せず、CSSで安全に汎用スタンプを描画
                 const textUI = spotMaster.languages[currentLang].ui;
                 slot.innerHTML = `<div class="stamp-default-mark">${textUI.stampDefaultText}</div>`;
             }
@@ -527,21 +563,59 @@
         }
     }
 
-    // 全スタンプマスの見た目を再描画
     function updateStampDisplayAll() {
-        Object.keys(spotMaster.images).forEach(spotCode => {
-            updateStampSlotVisual(spotCode);
-        });
+        Object.keys(spotMaster.images).forEach(spotCode => { updateStampSlotVisual(spotCode); });
     }
 
-    // アクセシビリティ切り替え
+    // 🎥 カメラ起動・停止処理（復活＆拡張）
+    async function toggleCamera() {
+        const cameraArea = document.getElementById('cameraArea');
+        const video = document.getElementById('video-preview');
+
+        if (videoStream) {
+            // カメラを止める処理
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+            cameraArea.style.display = "none";
+            updateScanButtonText();
+        } else {
+            // カメラを起動する処理
+            try {
+                // 本番（背面カメラ優先指定：facingMode: "environment"）
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                    audio: false
+                });
+                videoStream = stream;
+                video.srcObject = stream;
+                cameraArea.style.display = "block";
+                updateScanButtonText();
+
+                // 【会議・検証用エミュレート】
+                // 実際の現場テストや環境整備が完了するまでは、カメラを起動した2秒後に
+                // 未取得のスタンプをランダムに擬似検知してスタンプが押される仕組みにしてあります。
+                setTimeout(() => {
+                    if (videoStream) {
+                        const available = Object.keys(spotMaster.images).filter(s => !collectedSpots.has(s));
+                        if (available.length > 0) {
+                            const nextSpot = available[0];
+                            alert(`【カメラテスト】QRコード「${nextSpot}」を検知しました！`);
+                            processStampInbound(nextSpot);
+                        }
+                        toggleCamera(); // 読み取ったら自動で閉じる
+                    }
+                }, 2500);
+
+            } catch (err) {
+                alert("カメラの起動に失敗しました。ブラウザのカメラ権限を許可してください。");
+                console.error(err);
+            }
+        }
+    }
+
     function toggleContrast() {
         isHighContrast = !isHighContrast;
-        if (isHighContrast) {
-            document.body.classList.add('high-contrast');
-        } else {
-            document.body.classList.remove('high-contrast');
-        }
+        document.body.classList.toggle('high-contrast', isHighContrast);
         updateContrastButtonText();
     }
 
@@ -561,26 +635,18 @@
         }
     }
 
-    // ==========================================
-    // 🔗 【本番・テスト共通】QRコードエミュレート機能
-    // スマホでブラウザのアドレスに「?spot=W1」などを付けて開くと、
-    // 実際にそのQRコードをスキャンしてアクセスした時の処理が走ります。
-    // ==========================================
     function checkUrlParameter() {
         const urlParams = new URLSearchParams(window.location.search);
-        const spotCode = urlParams.get('spot'); // 例: ?spot=W1
-        
+        const spotCode = urlParams.get('spot');
         if (spotCode) {
-            // パラメータが存在したらスタンプを押す処理を実行
             setTimeout(() => {
                 processStampInbound(spotCode.toUpperCase());
-                // アドレスバーのパラメータを綺麗に消去（再読み込みでの二重カウント防止）
                 window.history.replaceState({}, document.title, window.location.pathname);
             }, 300);
         }
     }
 
-    // 初期起動実行
+    // 初期化
     loadUserData();
     switchLang('ja');
     checkUrlParameter();
