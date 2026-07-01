@@ -56,7 +56,7 @@
             color: white;
         }
 
-        /* 👁️ みやすさ切り替えボタン（通常時） */
+        /* 👁️ みやすさ切り替えボタン */
         .accessibility-box {
             width: 100%;
             max-width: 300px;
@@ -169,7 +169,13 @@
             font-size: 16px;
         }
         
-        /* 押されたスタンプ画像 */
+        /* 押されたスタンプ（リンクの入る枠） */
+        .stamp-link {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: 50%;
+        }
         .stamp-image {
             width: 100%;
             height: 100%;
@@ -197,9 +203,7 @@
             margin-top: 15px;
         }
 
-        /* =========================================================
-           👁️‍🗨️ 高コントラストモード（ロービジョン対策スタイル）
-           ========================================================= */
+        /* --- 👁️‍🗨️ 高コントラストモードスタイル --- */
         body.high-contrast {
             background-color: #000000 !important;
             color: #ffffff !important;
@@ -208,7 +212,6 @@
             background-color: #000000 !important;
             color: #ffffff !important;
             border: 5px solid #ffffff !important;
-            box-shadow: none !important;
         }
         body.high-contrast .contrast-toggle-btn {
             background-color: #ffffff !important;
@@ -225,10 +228,7 @@
             color: #000000 !important;
             border: 3px solid #ffffff !important;
         }
-        body.high-contrast h1 {
-            color: #ffffff !important;
-            font-weight: 900 !important;
-        }
+        body.high-contrast h1 { color: #ffffff !important; font-weight: 900 !important; }
         body.high-contrast .info-text {
             background-color: #000000 !important;
             color: #ffffff !important;
@@ -238,31 +238,23 @@
             background-color: #ffffff !important;
             color: #000000 !important;
             border: 4px solid #ffffff !important;
-            box-shadow: none !important;
-            font-size: 22px !important; /* 文字をより大きく */
+            font-size: 22px !important;
         }
         body.high-contrast .course-section {
             background-color: #000000 !important;
             border: 4px solid #ffffff !important;
         }
-        body.high-contrast .course-title {
-            color: #ffffff !important;
-            font-size: 22px !important;
-        }
+        body.high-contrast .course-title { color: #ffffff !important; font-size: 22px !important; }
         body.high-contrast .stamp-slot {
             background-color: #000000 !important;
             color: #ffffff !important;
-            border: 3px solid #ffffff !important; /* 破線を実線に、太く */
-            width: 65px !important;  /* 少し大きくして見やすく */
+            border: 3px solid #ffffff !important;
+            width: 65px !important;
             height: 65px !important;
             font-size: 16px !important;
         }
-        body.high-contrast .stamp-slot.goal {
-            border: 4px double #ffffff !important;
-            color: #ffffff !important;
-        }
+        body.high-contrast .stamp-slot.goal { border: 4px double #ffffff !important; color: #ffffff !important; }
         body.high-contrast .stamp-image {
-            /* 白黒画面でもイラストの形が判別しやすいよう、輪郭をくっきりさせるフィルター */
             filter: contrast(150%) brightness(110%);
             border: 2px solid #ffffff;
         }
@@ -277,7 +269,6 @@
             color: #ffffff !important;
             border: 2px solid #ffffff !important;
             font-size: 14px !important;
-            padding: 8px 20px !important;
         }
     </style>
 </head>
@@ -294,7 +285,7 @@
         
         <div class="accessibility-box">
             <button class="contrast-toggle-btn" onclick="toggleContrast()" id="contrastBtn">
-                👁️ みやすさ：しろうろこ（通常）
+                👁️ みやすさ：通常（カラー）
             </button>
         </div>
     </div>
@@ -303,7 +294,7 @@
     
     <div class="info-text" id="infoText">
         下のボタンをおして、お店のQRコードをよみとろう！<br>
-        タブがふえずにスタンプがたまるよ！
+        スタンプをあつめると、各施設（しせつ）のホームページが見られるよ！
     </div>
 
     <button class="scan-btn" onclick="simulateScan()">
@@ -333,55 +324,68 @@
     </div>
 
     <div class="status-msg" id="statusMsg">
-        スタンプのまるをタップしてみてね！
+        QRコードをよみとってスタンプをあつめよう！
     </div>
 
     <button class="reset-btn" onclick="resetRally()" id="resetBtn">リセット</button>
 </div>
 
 <script>
+    // --- 各スポットの施設ホームページURL（設定） ---
+    // 打合せ用に仮のURL（例としてGoogleやYahooなど）を入れています。本番用に書き換え可能です。
+    const spotLinks = {
+        "W1": "https://www.google.com",
+        "W2": "https://www.yahoo.co.jp",
+        "W3": "https://www.bing.com",
+        "W4": "https://www.wikipedia.org",
+        "U1": "https://www.google.com",
+        "U2": "https://www.yahoo.co.jp",
+        "U3": "https://www.bing.com",
+        "U4": "https://www.wikipedia.org"
+    };
+
     // --- 翻訳データ ---
     const i18n = {
         ja: {
             title: "わくわく スタンプラリー",
-            info: "下のボタンをおして、お店のQRコードをよみとろう！<br>タブがふえずにスタンプがたまるよ！",
+            info: "下のボタンをおして、お店のQRコードをよみとろう！<br>スタンプをあつめると、各施設（しせつ）のホームページが見られるよ！",
             scan: "QRコードをよみとる",
             courseW: "わくわくコース",
             courseU: "うきうきコース",
-            hint: "スタンプのまるをタップしてみてね！",
+            hint: "QRコードをよみとってスタンプをあつめよう！",
             reset: "リセット",
             btnNormal: "👁️ みやすさ：通常（カラー）",
             btnHigh: "👁️ みやすさ：はっきり（白黒）"
         },
         en: {
             title: "Exciting Stamp Rally",
-            info: "Tap the button below to scan the shop's QR code!<br>Stamps accumulate without opening new tabs.",
+            info: "Tap the button below to scan the shop's QR code!<br>Collect stamps to view each facility's website!",
             scan: "Scan QR Code",
             courseW: "Wakuwaku Course",
             courseU: "Ukiuki Course",
-            hint: "Try tapping the stamp circles!",
+            hint: "Scan QR codes to collect stamps!",
             reset: "Reset",
             btnNormal: "👁️ View: Normal (Color)",
             btnHigh: "👁️ View: High Contrast"
         },
         zh: {
             title: "集章拉力赛",
-            info: "点击下方按钮扫描商家QR码！<br>无需打开新标签页即可集章。",
+            info: "点击下方按钮扫描商家QR码！<br>集齐印章即可查看各设施的官方网站！",
             scan: "扫描QR码",
             courseW: "Wakuwaku 路线",
             courseU: "Ukiuki 路线",
-            hint: "尝试点击印章圆圈！",
+            hint: "扫描QR码来收集印章！",
             reset: "重置",
             btnNormal: "👁️ 视角: 普通（彩色）",
             btnHigh: "👁️ 视角: 高对比度（黑白）"
         },
         ko: {
-            title: "두근두근 스탬프 랠리",
-            info: "아래 버튼을 눌러 매장의 QR 코드를 스캔하세요!<br>새 탭을 열지 않고 스탬프가 적립됩니다.",
+            title: "두근두근 스탬프 랠り",
+            info: "아래 버튼을 눌러 매장의 QR 코드를 스캔하세요!<br>스탬프를 모으면 각 시설의 홈페이지를 볼 수 있습니다!",
             scan: "QR 코드 스캔",
             courseW: "와쿠와쿠 코스",
             courseU: "우키우키 코스",
-            hint: "스탬프 동그라미를 탭해 보세요!",
+            hint: "QR 코드를 스캔하여 스탬프를 모으세요!",
             reset: "리셋",
             btnNormal: "👁️ 보기: 일반 (컬러)",
             btnHigh: "👁️ 보기: 고대비 (흑백)"
@@ -391,7 +395,6 @@
     let currentLang = 'ja';
     let isHighContrast = false;
 
-    // --- 言語切り替え機能 ---
     function switchLang(lang) {
         currentLang = lang;
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
@@ -408,7 +411,6 @@
         updateContrastButtonText();
     }
 
-    // --- 👁️ 高コントラスト（みやすさ）トグル機能 ---
     function toggleContrast() {
         isHighContrast = !isHighContrast;
         if (isHighContrast) {
@@ -428,39 +430,47 @@
         }
     }
 
-    // --- テスト用の簡易スタンプ付与ロジック ---
-    // 本番はここにQRコードリーダーのプログラム（jsQRなど）が連動します
+    // --- 【打合せデモ用ロジック】 ---
+    // 本番はQRコードを読み取った際に、そのスポットのコード（W1など）が自動で stampPressed() に渡されます。
+    // 今回はデモボタンを押すたびに、W1 → W2 → W3... と順番に疑似スキャンが進むようにしました。
+    let demoIndex = 0;
+    const demoSpots = ["W1", "W2", "W3", "W4", "U1"];
+
     function simulateScan() {
-        alert("カメラ起動（テスト用）：デモとしてW1のスタンプを押します。");
-        stampPressed("W1");
+        if (demoIndex < demoSpots.length) {
+            const currentSpot = demoSpots[demoIndex];
+            alert(`【デモ動作】QRコードから「${currentSpot}」を検出しました！スタンプを押します。`);
+            stampPressed(currentSpot);
+            demoIndex++;
+        } else {
+            alert("デモ用のスタンプは押し終わりました。一度リセットしてください。");
+        }
     }
 
-    // マスを直接タップしてもテストできるようにしています
-    document.querySelectorAll('.stamp-slot').forEach(slot => {
-        slot.addEventListener('click', function() {
-            const id = this.id.replace('slot-', '');
-            if(!id.includes('goal')) {
-                stampPressed(id);
-            }
-        });
-    });
+    // ※マスを直接タップする「テスト用タップ機能」は完全に削除しました。
 
+    // スタンプを押す処理（施設ホームページのリンクを埋め込む）
     function stampPressed(spotCode) {
         const slot = document.getElementById(`slot-${spotCode}`);
         if (slot && !slot.querySelector('img')) {
-            // テスト用画像として前にアップロードされた「HOW_logo_W1.png」を表示
-            slot.innerHTML = `<img src="HOW_logo_W1.png" class="stamp-image" alt="スタンプ">`;
-            document.getElementById('statusMsg').innerText = `【${spotCode}】スタンプをゲットしました！`;
+            const destinationUrl = spotLinks[spotCode] || "#";
+            
+            // マスの中に、施設サイトへのリンク付きで画像を埋め込みます
+            slot.innerHTML = `
+                <a href="${destinationUrl}" target="_blank" class="stamp-link">
+                    <img src="HOW_logo_W1.png" class="stamp-image" alt="${spotCode}">
+                </a>
+            `;
+            document.getElementById('statusMsg').innerHTML = `🎉【${spotCode}】ゲット！<br><span style="font-size:12px; font-weight:normal;">スタンプをタップすると施設サイトへ移動します</span>`;
             checkGoal();
         }
     }
 
     function checkGoal() {
-        // ゴール判定ロジック（簡易版）
         const wCount = document.querySelectorAll('.course-w .stamp-image').length;
         if (wCount === 4) {
             document.getElementById('slot-W-goal').innerText = "🎉";
-            document.getElementById('statusMsg').innerText = "わくわくコースクリア！景品をもらってね！";
+            document.getElementById('statusMsg').innerHTML = "<strong>わくわくコースクリア！景品をもらってね！</strong>";
         }
     }
 
@@ -469,7 +479,6 @@
         location.reload();
     }
 
-    // 初期化
     updateContrastButtonText();
 </script>
 
