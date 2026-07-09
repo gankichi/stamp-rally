@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>わくわく デジタルスタンプラリー（テスト用）</title>
@@ -47,7 +47,7 @@
             padding: 6px 12px;
             border-radius: 15px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
         }
         .lang-btn.active { background-color: #ff5a5f; color: white; }
@@ -175,6 +175,8 @@
         <div class="lang-buttons">
             <button class="lang-btn active" id="btn-ja" onclick="switchLang('ja')">日本語</button>
             <button class="lang-btn" id="btn-en" onclick="switchLang('en')">English</button>
+            <button class="lang-btn" id="btn-zh" onclick="switchLang('zh')">简体中文</button>
+            <button class="lang-btn" id="btn-ko" onclick="switchLang('ko')">한국어</button>
         </div>
         <div class="accessibility-box">
             <button class="audio-btn" id="audioBtn" onclick="toggleSpeech()">🔊 <span id="audioBtnText">おんせいガイドを聴く</span></button>
@@ -238,7 +240,7 @@
 
 <script>
     // ==========================================
-    // ⚙️ マスタ設定（音声用の裏よみがなデータ付き）
+    // ⚙️ マスタ設定（4カ国語完全対応＋裏よみがなデータ）
     // ==========================================
     const spotMaster = {
         images: {
@@ -278,10 +280,19 @@
             },
             en: {
                 spots: {
-                    "W1": { name: "Kodomo no Yakata", message: "Indoor play facility!", url: "https://www.kodomo-how.com/", hint: "Hint W1", speech: "You got W1, Kodomo no Yakata!" }
+                    "W1": { name: "Kodomo no Yakata", message: "Indoor play facility filled with child-friendly fun!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W1] Go to the 7th floor via the red elevator! Near reception.", speech: "W 1, Kodomo no Yakata! Indoor play facility filled with child-friendly fun." },
+                    "W2": { name: "Facility W2", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W2] Location hint here.", speech: "You got W 2!" },
+                    "W3": { name: "Facility W3", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W3] Location hint here.", speech: "You got W 3!" },
+                    "W4": { name: "Facility W4", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W4] Location hint here.", speech: "You got W 4!" },
+                    "W5": { name: "Wakuwaku Special", message: "You got a special stamp!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W5] Hidden in a special place!", speech: "W 5, Wakuwaku Special Stamp!" },
+                    "U1": { name: "Facility U1", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U1] Location hint here.", speech: "You got U 1!" },
+                    "U2": { name: "Facility U2", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U2] Location hint here.", speech: "You got U 2!" },
+                    "U3": { name: "Facility U3", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U3] Location hint here.", speech: "You got U 3!" },
+                    "U4": { name: "Facility U4", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U4] Location hint here.", speech: "You got U 4!" },
+                    "U5": { name: "Ukiuki Special", message: "You got a special stamp!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U5] Hidden in a special place!", speech: "U 5, Ukiuki Special Stamp!" }
                 },
                 ui: {
-                    title: "Exciting Stamp Rally (Test Ver)", info: "Scan QR codes to collect stamps!",
+                    title: "Exciting Stamp Rally (Test Ver)", info: "Scan QR codes to collect stamps! Prizes are first-come, first-served.",
                     scanBtnStart: "Scan QR Code", scanBtnStop: "Close Camera",
                     courseW: "Wakuwaku Course", courseU: "Ukiuki Course",
                     defaultHint: "Scan QR codes to collect stamps!",
@@ -295,162 +306,23 @@
                     audioStart: "Listen to Voice Guide", audioStop: "Stop Voice Guide",
                     speechDefault: "Welcome to the exciting stamp rally test page. Scan QR codes to collect stamps!"
                 }
-            }
-        }
-    };
-
-    // --- 内部変数 ---
-    let currentLang = 'ja';
-    let isHighContrast = false;
-    let lastActiveSpot = null;          
-    let collectedSpots = new Set();  
-    let redeemedW = false; 
-    let redeemedU = false; 
-    let videoStream = null;
-    let synth = window.speechSynthesis; // 🔊 音声合成エンジン
-
-    function loadUserData() {
-        const saved = localStorage.getItem('vaku_rally_data_v6');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                collectedSpots = new Set(parsed.spots || []);
-                lastActiveSpot = parsed.lastActive || null;
-                redeemedW = parsed.redeemedW || false;
-                redeemedU = parsed.redeemedU || false;
-            } catch(e) {}
-        }
-    }
-
-    function saveUserData() {
-        const data = {
-            spots: Array.from(collectedSpots), lastActive: lastActiveSpot,
-            redeemedW: redeemedW, redeemedU: redeemedU
-        };
-        localStorage.setItem('vaku_rally_data_v6', JSON.stringify(data));
-    }
-
-    function switchLang(lang) {
-        stopSpeech();
-        currentLang = spotMaster.languages[lang] ? lang : 'ja';
-        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`btn-${currentLang}`);
-        if(activeBtn) activeBtn.classList.add('active');
-
-        const textUI = spotMaster.languages[currentLang].ui;
-        document.getElementById('mainTitle').innerText = textUI.title;
-        document.getElementById('infoText').innerHTML = textUI.info;
-        document.getElementById('titleW').innerText = textUI.courseW;
-        document.getElementById('titleU').innerText = textUI.courseU;
-        document.getElementById('resetBtn').innerText = textUI.reset;
-        document.getElementById('giftTitle').innerText = textUI.giftTitle;
-        document.getElementById('giftLabelW').innerText = textUI.giftLabelW;
-        document.getElementById('giftLabelU').innerText = textUI.giftLabelU;
-        
-        if (videoStream) {
-            document.getElementById('scanBtnText').innerText = textUI.scanBtnStop;
-        } else {
-            document.getElementById('scanBtnText').innerText = textUI.scanBtnStart;
-        }
-        
-        updateStampDisplayAll();
-        updateGiftBadges();
-        updateMessageArea();
-        updateContrastButtonText();
-        updateAudioButtonText();
-    }
-
-    function updateGiftBadges() {
-        const textUI = spotMaster.languages[currentLang].ui;
-        const badgeW = document.getElementById('badge-W');
-        const badgeU = document.getElementById('badge-U');
-
-        badgeW.innerText = redeemedW ? textUI.giftDone : textUI.giftYet;
-        badgeW.className = redeemedW ? "gift-badge done" : "gift-badge yet";
-
-        badgeU.innerText = redeemedU ? textUI.giftDone : textUI.giftYet;
-        badgeU.className = redeemedU ? "gift-badge done" : "gift-badge yet";
-    }
-
-    function updateMessageArea() {
-        const statusEl = document.getElementById('statusMsg');
-        const textUI = spotMaster.languages[currentLang].ui;
-        const spotsData = spotMaster.languages[currentLang].spots;
-        
-        const wMaster = ["W1", "W2", "W3", "W4", "W5"];
-        const uMaster = ["U1", "U2", "U3", "U4", "U5"];
-        const isWComplete = wMaster.every(s => collectedSpots.has(s));
-        const isUComplete = uMaster.every(s => collectedSpots.has(s));
-
-        if (isWComplete && isUComplete && !redeemedW && !redeemedU) {
-            statusEl.innerHTML = `<strong>${textUI.clearBoth}</strong>`; return;
-        }
-        if (isWComplete && !redeemedW) {
-            statusEl.innerHTML = `<strong>${textUI.clearW}</strong>`; return;
-        }
-        if (isUComplete && !redeemedU) {
-            statusEl.innerHTML = `<strong>${textUI.clearU}</strong>`; return;
-        }
-
-        if (lastActiveSpot && spotsData[lastActiveSpot]) {
-            const detail = spotsData[lastActiveSpot];
-            if (collectedSpots.has(lastActiveSpot)) {
-                statusEl.innerHTML = `
-                    <div><strong>🎉【${detail.name}】GET!</strong></div>
-                    <div style="font-size: 13px; font-weight: normal; color: #666; margin: 2px 0;">${detail.message}</div>
-                    <a href="${detail.url}" target="_blank" class="facility-link-btn">${textUI.goWeb} 🔗</a>
-                `;
-            } else {
-                statusEl.innerText = detail.hint;
-            }
-        } else {
-            statusEl.innerText = textUI.defaultHint;
-        }
-    }
-
-    // 🔊 音声読み上げロジック（裏よみがな優先）
-    function toggleSpeech() {
-        if (!synth) { alert("このブラウザは音声読み上げに対応していません。"); return; }
-
-        if (synth.speaking) {
-            stopSpeech();
-            return;
-        }
-
-        const textUI = spotMaster.languages[currentLang].ui;
-        const spotsData = spotMaster.languages[currentLang].spots;
-        let targetText = textUI.speechDefault;
-
-        const wMaster = ["W1", "W2", "W3", "W4", "W5"];
-        const uMaster = ["U1", "U2", "U3", "U4", "U5"];
-        const isWComplete = wMaster.every(s => collectedSpots.has(s));
-        const isUComplete = uMaster.every(s => collectedSpots.has(s));
-
-        // 状態に応じた音声テキストの選定
-        if (isWComplete && !redeemedW) {
-            targetText = "わくわくコースクリア！引換所で、わくわく景品専用キューアールコードを読み取ってね！";
-        } else if (isUComplete && !redeemedU) {
-            targetText = "うきうきコースクリア！引換所で、うきうき景品専用キューアールコードを読み取ってね！";
-        } else if (lastActiveSpot && spotsData[lastActiveSpot]) {
-            if (collectedSpots.has(lastActiveSpot)) {
-                targetText = spotsData[lastActiveSpot].speech;
-            } else {
-                targetText = spotsData[lastActiveSpot].hint;
-            }
-        }
-
-        const utter = new SpeechSynthesisUtterance(targetText);
-        utter.lang = currentLang === 'ja' ? 'ja-JP' : 'en-US';
-        utter.rate = 0.9; // 聴き取りやすいように少しゆっくりめ
-
-        utter.onend = () => { updateAudioButtonText(); };
-        utter.onerror = () => { updateAudioButtonText(); };
-
-        document.getElementById('audioBtn').classList.add('playing');
-        document.getElementById('audioBtnText').innerText = textUI.audioStop;
-        synth.speak(utter);
-    }
-
-    function stopSpeech() {
-        if (synth && synth.speaking) { synth.cancel(); }
-        updateAudioButtonText();
+            },
+            zh: {
+                spots: {
+                    "W1": { name: "北九州市立市立儿童馆", message: "充满儿童乐趣的室内游乐设施♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1提示】乘红色电梯到7楼！在接待处附近♪", speech: "恭喜获得W 1 北九州市立儿童馆！" },
+                    "W2": { name: "设施W2", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【W2提示】位置提示。", speech: "获得W 2" },
+                    "W3": { name: "设施W3", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【W3提示】位置提示。", speech: "获得W 3" },
+                    "W4": { name: "设施W4", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【W4提示】位置提示。", speech: "获得W 4" },
+                    "W5": { name: "欢乐特别印章", message: "获得了特别印章！", url: "https://www.kodomo-how.com/", hint: "🔍【W5提示】藏在特殊的地方哦！", speech: "获得W 5 欢乐特别印章" },
+                    "U1": { name: "设施U1", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【U1提示】位置提示。", speech: "获得U 1" },
+                    "U2": { name: "设施U2", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【U2提示】位置提示。", speech: "获得U 2" },
+                    "U3": { name: "设施U3", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【U3提示】位置提示。", speech: "获得U 3" },
+                    "U4": { name: "设施U4", message: "介绍文。", url: "https://www.kodomo-how.com/", hint: "🔍【U4提示】位置提示。", speech: "获得U 4" },
+                    "U5": { name: "无忧特别印章", message: "获得了特别印章！", url: "https://www.kodomo-how.com/", hint: "🔍【U5提示】藏在特殊的地方哦！", speech: "获得U 5 无忧特别印章" }
+                },
+                ui: {
+                    title: "集章活动（测试版）", info: "扫描各景点的二维码来收集印章吧！奖品先到先得。",
+                    scanBtnStart: "扫描二维码", scanBtnStop: "关闭摄像头",
+                    courseW: "欢乐路线", courseU: "无忧路线",
+                    defaultHint: "扫描二维码来收集印章吧！",
+                    clearW: "欢乐路线达成！请在兑换处扫描奖品二维码！",
