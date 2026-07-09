@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>わくわく デジタルスタンプラリー</title>
+    <title>わくわく デジタルスタンプラリー_テスト環境</title>
     <style>
         /* --- 基本デザイン --- */
         body {
@@ -28,7 +28,6 @@
             border: 4px solid #ffcc00;
         }
         
-        /* コントロールパネル */
         .control-panel {
             margin-bottom: 20px;
             display: flex;
@@ -51,206 +50,91 @@
             font-size: 14px;
             font-weight: bold;
         }
-        .lang-btn.active {
-            background-color: #ff5a5f;
-            color: white;
-        }
-        .accessibility-box {
-            width: 100%;
-            max-width: 300px;
-        }
+        .lang-btn.active { background-color: #ff5a5f; color: white; }
+        .accessibility-box { width: 100%; max-width: 300px; }
         .contrast-toggle-btn {
-            width: 100%;
-            background-color: #222222;
-            color: #ffffff;
-            border: 2px solid #000000;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%; background-color: #222222; color: #ffffff; border: 2px solid #000000;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            color: #ff5a5f;
-            margin: 10px 0;
-            font-size: 26px;
-        }
+        h1 { color: #ff5a5f; margin: 10px 0; font-size: 26px; }
         .info-text {
-            background-color: #fff5da;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 20px;
-            color: #665544;
-            line-height: 1.5;
-            text-align: left;
+            background-color: #fff5da; padding: 12px; border-radius: 10px; font-size: 14px;
+            margin-bottom: 20px; color: #665544; line-height: 1.5; text-align: left;
         }
 
-        /* 📷 カメラエリア（追加） */
         .scan-btn {
-            background-color: #ff5a5f;
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 6px 14px rgba(255, 90, 95, 0.4);
-            margin-bottom: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background-color: #ff5a5f; color: white; border: none; padding: 14px 28px;
+            font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 6px 14px rgba(255, 90, 95, 0.4); margin-bottom: 20px;
+            display: inline-flex; align-items: center; gap: 8px;
         }
         .camera-container {
-            display: none;
-            position: relative;
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto 20px auto;
-            border: 3px solid #ff5a5f;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #000;
+            display: none; position: relative; width: 100%; max-width: 320px;
+            margin: 0 auto 20px auto; border: 3px solid #ff5a5f; border-radius: 12px;
+            overflow: hidden; background-color: #000;
         }
-        #video-preview {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+        #video-preview { width: 100%; height: auto; display: block; }
         .camera-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60%;
-            height: 60%;
-            border: 2px dashed #ff5a5f;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
-            pointer-events: none;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60%; height: 60%; border: 2px dashed #ff5a5f;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); pointer-events: none;
         }
 
         /* コースエリア */
-        .course-section {
-            border-radius: 15px;
-            padding: 15px 10px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
+        .course-section { border-radius: 15px; padding: 15px 10px; margin-bottom: 20px; box-sizing: border-box; }
         .course-w { background-color: #f0fdf4; border: 2px dashed #4ade80; }
         .course-u { background-color: #eff6ff; border: 2px dashed #60a5fa; }
-        .course-title {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
+        .course-title { font-weight: bold; font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .course-w .course-title { color: #166534; }
         .course-u .course-title { color: #1e40af; }
 
-        /* スタンプマス目 */
-        .stamp-grid {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            padding: 5px;
-            overflow-x: auto;
-        }
+        /* スタンプマス目（5マスが綺麗に収まるよう調整） */
+        .stamp-grid { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 5px; overflow-x: auto; }
         .stamp-slot {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #ffffff;
-            border: 2px dotted #cccccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #999999;
-            font-weight: bold;
-            position: relative;
-            flex-shrink: 0;
-            box-sizing: border-box;
-            cursor: pointer;
-            user-select: none;
+            width: 55px; height: 55px; border-radius: 50%; background-color: #ffffff; border: 2px dotted #cccccc;
+            display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999999; font-weight: bold;
+            position: relative; flex-shrink: 0; box-sizing: border-box; cursor: pointer; user-select: none;
         }
-        .stamp-slot.goal {
-            border: 2px dashed #fbbf24;
-            background-color: #fffdf5;
-            color: #fbbf24;
-            font-size: 16px;
-            cursor: default;
-        }
+        .stamp-slot.special { border: 2px dashed #a855f7; background-color: #faf5ff; color: #a855f7; font-size: 11px; }
+        .stamp-image { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
         
-        .stamp-image {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
         .stamp-default-mark {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-color: #ffebd3;
-            border: 2px solid #ff5a5f;
-            color: #ff5a5f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-            box-sizing: border-box;
+            width: 100%; height: 100%; border-radius: 50%; background-color: #ffebd3; border: 2px solid #ff5a5f;
+            color: #ff5a5f; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; box-sizing: border-box;
+        }
+        .stamp-special-mark {
+            width: 100%; height: 100%; border-radius: 50%; background-color: #f3e8ff; border: 2px solid #a855f7;
+            color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; box-sizing: border-box;
         }
 
         /* 状態メッセージエリア */
         .status-msg {
-            background-color: #f3f4f6;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: bold;
-            margin-top: 10px;
-            border: 1px solid #e5e7eb;
-            min-height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 8px;
+            background-color: #f3f4f6; padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold;
+            margin-top: 10px; border: 1px solid #e5e7eb; min-height: 60px;
+            display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
         }
         .facility-link-btn {
-            display: inline-block;
-            background-color: #3b82f6;
-            color: white !important;
-            text-decoration: none;
-            padding: 6px 14px;
-            font-size: 13px;
-            border-radius: 20px;
-            margin-top: 5px;
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-            font-weight: bold;
+            display: inline-block; background-color: #3b82f6; color: white !important; text-decoration: none;
+            padding: 6px 14px; font-size: 13px; border-radius: 20px; margin-top: 5px; font-weight: bold;
         }
-        .reset-btn {
-            background-color: transparent;
-            color: #9ca3af;
-            border: 1px solid #d1d5db;
-            padding: 5px 15px;
-            font-size: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 20px;
+
+        /* 📦 画面最下部：景品お渡し確認エリア */
+        .gift-status-section {
+            margin-top: 25px; padding: 15px; background-color: #f8fafc; border: 3px solid #cbd5e1; border-radius: 15px; text-align: left;
         }
+        .gift-status-title { font-size: 15px; font-weight: bold; color: #334155; margin-bottom: 10px; text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; }
+        .gift-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; }
+        .gift-row:last-child { border-bottom: none; }
+        .gift-name { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .gift-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-align: center; }
+        .gift-badge.yet { background-color: #e2e8f0; color: #64748b; border: 1px solid #cbd5e1; }
+        .gift-badge.done { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-size: 13px; animation: pop 0.3s ease; }
+
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+
+        .reset-btn { background-color: transparent; color: #9ca3af; border: 1px solid #d1d5db; padding: 5px 15px; font-size: 12px; border-radius: 10px; cursor: pointer; margin-top: 20px; }
 
         /* --- 高コントラストモード --- */
         body.high-contrast { background-color: #000000 !important; color: #ffffff !important; }
@@ -258,20 +142,19 @@
         body.high-contrast .contrast-toggle-btn { background-color: #ffffff !important; color: #000000 !important; border: 4px solid #ffffff !important; }
         body.high-contrast .lang-btn { background-color: #333333 !important; color: #ffffff !important; border: 2px solid #ffffff !important; }
         body.high-contrast .lang-btn.active { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #ffffff !important; }
-        body.high-contrast h1 { color: #ffffff !important; font-weight: 900 !important; }
+        body.high-contrast h1 { color: #ffffff !important; }
         body.high-contrast .info-text { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
         body.high-contrast .scan-btn { background-color: #ffffff !important; color: #000000 !important; border: 4px solid #ffffff !important; }
-        body.high-contrast .camera-container { border: 4px solid #ffffff !important; }
-        body.high-contrast .camera-overlay { border: 3px dashed #ffffff !important; }
         body.high-contrast .course-section { background-color: #000000 !important; border: 4px solid #ffffff !important; }
-        body.high-contrast .course-title { color: #ffffff !important; font-size: 22px !important; }
-        body.high-contrast .stamp-slot { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; width: 65px !important; height: 65px !important; font-size: 16px !important; }
-        body.high-contrast .stamp-slot.goal { border: 4px double #ffffff !important; color: #ffffff !important; }
-        body.high-contrast .stamp-image { filter: contrast(150%) brightness(110%); border: 2px solid #ffffff; }
+        body.high-contrast .course-title { color: #ffffff !important; }
+        body.high-contrast .stamp-slot { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
         body.high-contrast .stamp-default-mark { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #000000 !important; }
-        body.high-contrast .status-msg { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; font-size: 18px !important; }
-        body.high-contrast .facility-link-btn { background-color: #ffffff !important; color: #000000 !important; border: 2px solid #ffffff !important; }
-        body.high-contrast .reset-btn { background-color: #000000 !important; color: #ffffff !important; border: 2px solid #ffffff !important; font-size: 14px !important; }
+        body.high-contrast .stamp-special-mark { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #000000 !important; }
+        body.high-contrast .status-msg { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
+        body.high-contrast .gift-status-section { background-color: #000000 !important; border: 3px solid #ffffff !important; }
+        body.high-contrast .gift-status-title { color: #ffffff !important; border-bottom: 2px solid #ffffff !important; }
+        body.high-contrast .gift-badge.yet { background-color: #333333 !important; color: #ffffff !important; border: 1px solid #ffffff !important; }
+        body.high-contrast .gift-badge.done { background-color: #ffffff !important; color: #000000 !important; border: 2px solid #000000 !important; }
     </style>
 </head>
 <body>
@@ -285,9 +168,7 @@
             <button class="lang-btn" id="btn-ko" onclick="switchLang('ko')">한국어</button>
         </div>
         <div class="accessibility-box">
-            <button class="contrast-toggle-btn" onclick="toggleContrast()" id="contrastBtn">
-                👁️ みやすさ：通常（カラー）
-            </button>
+            <button class="contrast-toggle-btn" onclick="toggleContrast()" id="contrastBtn">👁️ みやすさ：通常（カラー）</button>
         </div>
     </div>
 
@@ -313,7 +194,7 @@
             <div class="stamp-slot" id="slot-W2" onclick="handleSlotClick('W2')">W2</div>
             <div class="stamp-slot" id="slot-W3" onclick="handleSlotClick('W3')">W3</div>
             <div class="stamp-slot" id="slot-W4" onclick="handleSlotClick('W4')">W4</div>
-            <div class="stamp-slot goal" id="slot-W-goal">★</div>
+            <div class="stamp-slot special" id="slot-W5" onclick="handleSlotClick('W5')">SP</div>
         </div>
     </div>
 
@@ -324,12 +205,22 @@
             <div class="stamp-slot" id="slot-U2" onclick="handleSlotClick('U2')">U2</div>
             <div class="stamp-slot" id="slot-U3" onclick="handleSlotClick('U3')">U3</div>
             <div class="stamp-slot" id="slot-U4" onclick="handleSlotClick('U4')">U4</div>
-            <div class="stamp-slot goal" id="slot-U-goal">★</div>
+            <div class="stamp-slot special" id="slot-U5" onclick="handleSlotClick('U5')">SP</div>
         </div>
     </div>
 
-    <div class="status-msg" id="statusMsg">
-        QRコードをよみとってスタンプをあつめよう！
+    <div class="status-msg" id="statusMsg">QRコードをよみとってスタンプをあつめよう！</div>
+
+    <div class="gift-status-section">
+        <div class="gift-status-title" id="giftTitle">🎁 景品こうかん じょうきょう</div>
+        <div class="gift-row">
+            <span class="gift-name">🟢 <span id="giftLabelW">わくわくコース景品</span></span>
+            <span class="gift-badge yet" id="badge-W">未受け取り</span>
+        </div>
+        <div class="gift-row">
+            <span class="gift-name">🔵 <span id="giftLabelU">うきうきコース景品</span></span>
+            <span class="gift-badge yet" id="badge-U">未受け取り</span>
+        </div>
     </div>
 
     <button class="reset-btn" onclick="resetRally()" id="resetBtn">最初からやり直す</button>
@@ -337,140 +228,99 @@
 
 <script>
     // ==========================================
-    // ⚙️ 本番用マスタデータ設定エリア
+    // ⚙️ マスタ設定（5マス構成）
     // ==========================================
     const spotMaster = {
         images: {
-            "W1": "HOW_logo_W1.png", // 子どもの館（確定）
-            "W2": null, "W3": null, "W4": null, "U1": null, "U2": null, "U3": null, "U4": null
+            "W1": "HOW_logo_W1.png", "W2": null, "W3": null, "W4": null, "W5": null,
+            "U1": null, "U2": null, "U3": null, "U4": null, "U5": null
         },
         languages: {
             ja: {
                 spots: {
                     "W1": { name: "北九州市立子どもの館", message: "子どもの楽しいが詰まった屋内遊戯施設♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1のヒント】赤のエレベーターで7階へ！受付の近くだよ♪" },
-                    "W2": { name: "施設W2（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W2のヒント】施設W2の場所のヒントがここに入ります。" },
-                    "W3": { name: "施設W3（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W3のヒント】施設W3の場所のヒントがここに入ります。" },
-                    "W4": { name: "施設W4（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W4のヒント】施設W4の場所のヒントがここに入ります。" },
-                    "U1": { name: "施設U1（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U1のヒント】施設U1の場所のヒントがここに入ります。" },
-                    "U2": { name: "施設U2（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U2のヒント】施設U2의の場所のヒントがここに入ります。" },
-                    "U3": { name: "施設U3（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U3のヒント】施設U3の場所のヒントがここに入ります。" },
-                    "U4": { name: "施設U4（未定）", message: "ここに施設の紹介テキストが入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U4のヒント】施設U4の場所のヒントがここに入ります。" }
+                    "W2": { name: "施設W2（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W2のヒント】場所のヒントが入ります。" },
+                    "W3": { name: "施設W3（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W3のヒント】場所のヒントが入ります。" },
+                    "W4": { name: "施設W4（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W4のヒント】場所のヒントが入ります。" },
+                    "W5": { name: "わくわくスペシャル", message: "特別なスタンプをゲットしたよ！", url: "https://www.kodomo-how.com/", hint: "🔍【W5(SP)のヒント】特別な場所に隠されているよ！" },
+                    "U1": { name: "施設U1（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U1のヒント】場所のヒントが入ります。" },
+                    "U2": { name: "施設U2（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U2のヒント】場所のヒントが入ります。" },
+                    "U3": { name: "施設U3（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U3のヒント】場所のヒントが入ります。" },
+                    "U4": { name: "施設U4（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U4のヒント】場所のヒントが入ります。" },
+                    "U5": { name: "うきうきスペシャル", message: "特別なスタンプをゲットしたよ！", url: "https://www.kodomo-how.com/", hint: "🔍【U5(SP)のヒント】特別な場所に隠されているよ！" }
                 },
                 ui: {
                     title: "わくわく スタンプラリー",
                     info: "各スポットにあるQRコードを読み取るとスタンプが押されるよ！<br>ゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。",
-                    scanBtnStart: "QRコードを読み取る",
-                    scanBtnStop: "カメラを閉じる",
-                    courseW: "わくわくコース",
-                    courseU: "うきうきコース",
+                    scanBtnStart: "QRコードを読み取る", scanBtnStop: "カメラを閉じる",
+                    courseW: "わくわくコース", courseU: "うきうきコース",
                     defaultHint: "QRコードをよみとってスタンプをあつめよう！",
-                    clearW: "<strong>わくわくコースクリア！景品をもらってね！ 🎉</strong>",
-                    reset: "最初からやり直す",
-                    btnNormal: "👁️ みやすさ：通常（カラー）",
-                    btnHigh: "👁️ みやすさ：はっきり（白黒）",
-                    goWeb: "ホームページをみる 🔗",
-                    stampDefaultText: "済"
+                    clearW: "<strong>わくわくコースクリア！ 🎉</strong><br>引換所で「わくわく景品QR」を読み取ってね！",
+                    clearU: "<strong>うきうきコースクリア！ 🎉</strong><br>引換所で「うきうき景品QR」を読み取ってね！",
+                    clearBoth: "<strong>両方のコースをクリアしたよ！すごーい！ 🌟</strong>",
+                    reset: "最初からやり直す", btnNormal: "👁️ みやすさ：通常（カラー）", btnHigh: "👁️ みやすさ：はっきり（白黒）",
+                    goWeb: "ホームページをみる 🔗", stampDefaultText: "済", stampSpecialText: "特",
+                    giftTitle: "🎁 景品こうかん じょうきょう", giftLabelW: "わくわくコース景品", giftLabelU: "うきうきコース景品",
+                    giftYet: "未受け取り", giftDone: "🏁 お渡し済み"
                 }
             },
             en: {
                 spots: {
-                    "W1": { name: "City of Kitakyushu Kodomo no Yakata", message: "An indoor play facility packed with fun for kids! ♪", url: "https://www.kodomo-how.com/", hint: "🔍 [W1 Hint] Take the red elevator to the 7th floor! Near the reception♪" },
-                    "W2": { name: "Facility W2 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W2 Hint] Location hint here." },
-                    "W3": { name: "Facility W3 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W3 Hint] Location hint here." },
-                    "W4": { name: "Facility W4 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [W4 Hint] Location hint here." },
-                    "U1": { name: "Facility U1 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U1 Hint] Location hint here." },
-                    "U2": { name: "Facility U2 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U2 Hint] Location hint here." },
-                    "U3": { name: "Facility U3 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U3 Hint] Location hint here." },
-                    "U4": { name: "Facility U4 (TBD)", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍 [U4 Hint] Location hint here." }
+                    "W1": { name: "Kodomo no Yakata", message: "Indoor play facility! ♪", url: "https://www.kodomo-how.com/", hint: "🔍 Hint W1" }
                 },
                 ui: {
-                    title: "Exciting Stamp Rally",
-                    info: "Scan the QR code at each spot to get a stamp!<br>Goal prizes are limited and available on a first-come, first-served basis.",
-                    scanBtnStart: "Scan QR Code",
-                    scanBtnStop: "Close Camera",
-                    courseW: "Wakuwaku Course",
-                    courseU: "Ukiuki Course",
+                    title: "Exciting Stamp Rally", info: "Scan QR codes!",
+                    scanBtnStart: "Scan QR Code", scanBtnStop: "Close Camera",
+                    courseW: "Wakuwaku Course", courseU: "Ukiuki Course",
                     defaultHint: "Scan QR codes to collect stamps!",
-                    clearW: "<strong>Wakuwaku Course Complete! Get your prize! 🎉</strong>",
-                    reset: "Reset All",
-                    btnNormal: "👁️ View: Normal (Color)",
-                    btnHigh: "👁️ View: High Contrast",
-                    goWeb: "Visit Website 🔗",
-                    stampDefaultText: "OK"
-                }
-            },
-            zh: {
-                spots: {
-                    "W1": { name: "北九州市立儿童之馆", message: "充满孩子们快乐的室内游乐设施♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 提示】搭乘红色电梯到7楼！就在接待处附近♪" },
-                    "W2": { name: "设施 W2（暂定）", message: "介绍文本。", url: "https://www.kodomo-how.com/", hint: "🔍【W2 提示】地点提示。" }
-                },
-                ui: {
-                    title: "集章拉力赛",
-                    info: "扫描各景点的QR码即可获得印章！",
-                    scanBtnStart: "扫描QR码",
-                    scanBtnStop: "关闭相机",
-                    courseW: "Wakuwaku 路线",
-                    courseU: "Ukiuki 路线",
-                    defaultHint: "扫描QR码来收集印章！",
-                    clearW: "<strong>Wakuwaku 路线完成！ 🎉</strong>",
-                    reset: "重置",
-                    btnNormal: "👁️ 视角: 普通（彩色）",
-                    btnHigh: "👁️ 视角: 高对比度（黑白）",
-                    goWeb: "访问官方网站 🔗",
-                    stampDefaultText: "获"
-                }
-            },
-            ko: {
-                spots: {
-                    "W1": { name: "기타큐슈 시립 어린이의 집", message: "아이들의 즐거움이 가득 찬 실내 놀이 시설♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 힌트】빨간색 엘리베이터를 타고 7층으로! 접수처 근처에 있어요♪" },
-                    "W2": { name: "시설 W2 (미정)", message: "소개 텍스트.", url: "https://www.kodomo-how.com/", hint: "🔍【W2 힌트】위치 힌트." }
-                },
-                ui: {
-                    title: "두근두근 스탬프 랠리",
-                    info: "각 스폿에 있는 QR 코드를 스캔하면 스탬프가 찍힙니다!",
-                    scanBtnStart: "QR 코드 스캔",
-                    scanBtnStop: "카메라 닫기",
-                    courseW: "와쿠와쿠 코스",
-                    courseU: "우키우키 코스",
-                    defaultHint: "QR 코드를 스캔하여 스탬프를 모으세요!",
-                    clearW: "<strong>와쿠와쿠 코스 클리어! 🎉</strong>",
-                    reset: "다시 시작하기",
-                    btnNormal: "👁️ 보기: 일반 (컬러)",
-                    btnHigh: "👁️ 보기: 고대비 (흑백)",
-                    goWeb: "홈페이지 보기 🔗",
-                    stampDefaultText: "완"
+                    clearW: "Wakuwaku Course Clear! Go to the prize station!",
+                    clearU: "Ukiuki Course Clear! Go to the prize station!",
+                    clearBoth: "Both Courses Complete! Awesome! 🌟",
+                    reset: "Reset All", btnNormal: "👁️ View: Normal", btnHigh: "👁️ View: High Contrast",
+                    goWeb: "Website 🔗", stampDefaultText: "OK", stampSpecialText: "SP",
+                    giftTitle: "🎁 Prize Exchange Status", giftLabelW: "Wakuwaku Prize", giftLabelU: "Ukiuki Prize",
+                    giftYet: "Not Claimed", giftDone: "🏁 Claimed"
                 }
             }
         }
     };
 
-    // --- 内部ロジック ---
+    // --- 内部変数 ---
     let currentLang = 'ja';
     let isHighContrast = false;
     let lastActiveSpot = null;          
     let collectedSpots = new Set();  
+    let redeemedW = false; // 🟢 わくわく景品お渡しフラグ
+    let redeemedU = false; // 🔵 うきうき景品お渡しフラグ
     let videoStream = null;
 
     function loadUserData() {
-        const saved = localStorage.getItem('vaku_rally_data');
+        const saved = localStorage.getItem('vaku_rally_data_v5');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
                 collectedSpots = new Set(parsed.spots || []);
                 lastActiveSpot = parsed.lastActive || null;
+                redeemedW = parsed.redeemedW || false;
+                redeemedU = parsed.redeemedU || false;
             } catch(e) {}
         }
     }
 
     function saveUserData() {
-        const data = { spots: Array.from(collectedSpots), lastActive: lastActiveSpot };
-        localStorage.setItem('vaku_rally_data', JSON.stringify(data));
+        const data = {
+            spots: Array.from(collectedSpots),
+            lastActive: lastActiveSpot,
+            redeemedW: redeemedW,
+            redeemedU: redeemedU
+        };
+        localStorage.setItem('vaku_rally_data_v5', JSON.stringify(data));
     }
 
     function switchLang(lang) {
-        currentLang = lang;
+        currentLang = spotMaster.languages[lang] ? lang : 'ja';
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`btn-${lang}`);
+        const activeBtn = document.getElementById(`btn-${currentLang}`);
         if(activeBtn) activeBtn.classList.add('active');
 
         const textUI = spotMaster.languages[currentLang].ui;
@@ -479,20 +329,42 @@
         document.getElementById('titleW').innerText = textUI.courseW;
         document.getElementById('titleU').innerText = textUI.courseU;
         document.getElementById('resetBtn').innerText = textUI.reset;
+        document.getElementById('giftTitle').innerText = textUI.giftTitle;
+        document.getElementById('giftLabelW').innerText = textUI.giftLabelW;
+        document.getElementById('giftLabelU').innerText = textUI.giftLabelU;
         
-        updateScanButtonText();
+        if (videoStream) {
+            document.getElementById('scanBtnText').innerText = textUI.scanBtnStop;
+        } else {
+            document.getElementById('scanBtnText').innerText = textUI.scanBtnStart;
+        }
+        
         updateStampDisplayAll();
+        updateGiftBadges();
         updateMessageArea();
         updateContrastButtonText();
     }
 
-    function updateScanButtonText() {
+    // 最下部バッジの見た目更新
+    function updateGiftBadges() {
         const textUI = spotMaster.languages[currentLang].ui;
-        const scanBtnText = document.getElementById('scanBtnText');
-        if (videoStream) {
-            scanBtnText.innerText = textUI.scanBtnStop;
+        const badgeW = document.getElementById('badge-W');
+        const badgeU = document.getElementById('badge-U');
+
+        if (redeemedW) {
+            badgeW.innerText = textUI.giftDone;
+            badgeW.className = "gift-badge done";
         } else {
-            scanBtnText.innerText = textUI.scanBtnStart;
+            badgeW.innerText = textUI.giftYet;
+            badgeW.className = "gift-badge yet";
+        }
+
+        if (redeemedU) {
+            badgeU.innerText = textUI.giftDone;
+            badgeU.className = "gift-badge done";
+        } else {
+            badgeU.innerText = textUI.giftYet;
+            badgeU.className = "gift-badge yet";
         }
     }
 
@@ -501,17 +373,27 @@
         const textUI = spotMaster.languages[currentLang].ui;
         const spotsData = spotMaster.languages[currentLang].spots;
         
-        const wSpots = ["W1", "W2", "W3", "W4"];
-        const isWComplete = wSpots.every(spot => collectedSpots.has(spot));
+        const wMaster = ["W1", "W2", "W3", "W4", "W5"];
+        const uMaster = ["U1", "U2", "U3", "U4", "U5"];
+        
+        const isWComplete = wMaster.every(s => collectedSpots.has(s));
+        const isUComplete = uMaster.every(s => collectedSpots.has(s));
 
-        if (isWComplete) {
-            statusEl.innerHTML = textUI.clearW;
-            document.getElementById('slot-W-goal').innerText = "🎉";
+        // メッセージエリアでのクリア案内（まだ景品を渡していない場合のみ促す）
+        if (isWComplete && isUComplete && !redeemedW && !redeemedU) {
+            statusEl.innerHTML = textUI.clearBoth;
             return;
-        } else {
-            document.getElementById('slot-W-goal').innerText = "★";
+        }
+        if (isWComplete && !redeemedW) {
+            statusEl.innerHTML = textUI.clearW;
+            return;
+        }
+        if (isUComplete && !redeemedU) {
+            statusEl.innerHTML = textUI.clearU;
+            return;
         }
 
+        // 通常のヒント表示
         if (lastActiveSpot && spotsData[lastActiveSpot]) {
             const detail = spotsData[lastActiveSpot];
             if (collectedSpots.has(lastActiveSpot)) {
@@ -535,6 +417,29 @@
     }
 
     function processStampInbound(spotCode) {
+        // 👑 景品専用コードの判定
+        if (spotCode === "W-GIFT") {
+            if (!redeemedW) {
+                redeemedW = true;
+                saveUserData();
+                updateGiftBadges();
+                updateMessageArea();
+                alert("わくわくコースの景品お渡しを記録しました！");
+            }
+            return;
+        }
+        if (spotCode === "U-GIFT") {
+            if (!redeemedU) {
+                redeemedU = true;
+                saveUserData();
+                updateGiftBadges();
+                updateMessageArea();
+                alert("うきうきコースの景品お渡しを記録しました！");
+            }
+            return;
+        }
+
+        // 通常スタンプの処理
         if (!spotMaster.images.hasOwnProperty(spotCode)) return;
 
         if (!collectedSpots.has(spotCode)) {
@@ -556,10 +461,14 @@
                 slot.innerHTML = `<img src="${imgPath}" class="stamp-image" alt="${spotCode}">`;
             } else {
                 const textUI = spotMaster.languages[currentLang].ui;
-                slot.innerHTML = `<div class="stamp-default-mark">${textUI.stampDefaultText}</div>`;
+                if(spotCode.endsWith("5")) {
+                    slot.innerHTML = `<div class="stamp-special-mark">${textUI.stampSpecialText}</div>`;
+                } else {
+                    slot.innerHTML = `<div class="stamp-default-mark">${textUI.stampDefaultText}</div>`;
+                }
             }
         } else {
-            slot.innerHTML = spotCode;
+            slot.innerHTML = spotCode.endsWith("5") ? "SP" : spotCode;
         }
     }
 
@@ -567,48 +476,51 @@
         Object.keys(spotMaster.images).forEach(spotCode => { updateStampSlotVisual(spotCode); });
     }
 
-    // 🎥 カメラ起動・停止処理（復活＆拡張）
     async function toggleCamera() {
         const cameraArea = document.getElementById('cameraArea');
         const video = document.getElementById('video-preview');
+        const textUI = spotMaster.languages[currentLang].ui;
 
         if (videoStream) {
-            // カメラを止める処理
             videoStream.getTracks().forEach(track => track.stop());
             videoStream = null;
             cameraArea.style.display = "none";
-            updateScanButtonText();
+            document.getElementById('scanBtnText').innerText = textUI.scanBtnStart;
         } else {
-            // カメラを起動する処理
             try {
-                // 本番（背面カメラ優先指定：facingMode: "environment"）
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" },
-                    audio: false
+                    video: { facingMode: "environment" }, audio: false
                 });
                 videoStream = stream;
                 video.srcObject = stream;
                 cameraArea.style.display = "block";
-                updateScanButtonText();
+                document.getElementById('scanBtnText').innerText = textUI.scanBtnStop;
 
-                // 【会議・検証用エミュレート】
-                // 実際の現場テストや環境整備が完了するまでは、カメラを起動した2秒後に
-                // 未取得のスタンプをランダムに擬似検知してスタンプが押される仕組みにしてあります。
+                // 検証用疑似スキャン（2秒後に未取得の通常マスか、未取得の引換コードをシミュレート）
                 setTimeout(() => {
                     if (videoStream) {
-                        const available = Object.keys(spotMaster.images).filter(s => !collectedSpots.has(s));
-                        if (available.length > 0) {
-                            const nextSpot = available[0];
-                            alert(`【カメラテスト】QRコード「${nextSpot}」を検知しました！`);
-                            processStampInbound(nextSpot);
+                        const wMaster = ["W1", "W2", "W3", "W4", "W5"];
+                        const isWComplete = wMaster.every(s => collectedSpots.has(s));
+
+                        if (isWComplete && !redeemedW) {
+                            // わくわくが全部集まっていて景品がまだなら、引き換えQRコードを擬似検知
+                            alert("【テスト】「わくわく景品お渡しQR (W-GIFT)」を検知しました！");
+                            processStampInbound("W-GIFT");
+                        } else {
+                            // それ以外は通常のスタンプを順番に埋める
+                            const available = Object.keys(spotMaster.images).filter(s => !collectedSpots.has(s));
+                            if (available.length > 0) {
+                                const nextSpot = available[0];
+                                alert(`【テスト】QR「${nextSpot}」を読み込みました！`);
+                                processStampInbound(nextSpot);
+                            }
                         }
-                        toggleCamera(); // 読み取ったら自動で閉じる
+                        toggleCamera();
                     }
-                }, 2500);
+                }, 2000);
 
             } catch (err) {
-                alert("カメラの起動に失敗しました。ブラウザのカメラ権限を許可してください。");
-                console.error(err);
+                alert("カメラの起動に失敗しました。");
             }
         }
     }
@@ -626,10 +538,11 @@
     }
 
     function resetRally() {
-        if (confirm("集めたスタンプをすべて消去してリセットします。よろしいですか？")) {
-            localStorage.removeItem('vaku_rally_data');
+        if (confirm("集めたスタンプ（W1〜W5、U1〜U5）をリセットしますか？\n（※最下部の『景品お渡し状況』は消えずに残ります）")) {
+            // 通常スタンプだけをクリア
             collectedSpots.clear();
             lastActiveSpot = null;
+            saveUserData();
             updateStampDisplayAll();
             switchLang(currentLang);
         }
@@ -646,7 +559,6 @@
         }
     }
 
-    // 初期化
     loadUserData();
     switchLang('ja');
     checkUrlParameter();
