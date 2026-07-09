@@ -504,7 +504,7 @@
             const textUI = spotMaster.languages[currentLang].ui;
             const spotsData = spotMaster.languages[currentLang].spots;
             
-            // 完全に初期状態の案内テキストをデフォルトに設定
+            // 初期状態の音声テキストを設定
             let targetText = textUI.speechDefault;
 
             const wMaster = ["W1", "W2", "W3", "W4", "W5"];
@@ -512,7 +512,6 @@
             const isWComplete = wMaster.every(s => collectedSpots.has(s));
             const isUComplete = uMaster.every(s => collectedSpots.has(s));
 
-            // 条件分岐の判定（画面文字をそのまま読まず、専用テキストに固定）
             if (isWComplete && !redeemedW) {
                 targetText = textUI.clearW;
             } else if (isUComplete && !redeemedU) {
@@ -521,6 +520,7 @@
                 if (collectedSpots.has(lastActiveSpot)) {
                     targetText = spotsData[lastActiveSpot].speechGet;
                 } else {
+                    // 🔍を含まない音声用のspeechHintを設定
                     targetText = spotsData[lastActiveSpot].speechHint;
                 }
             }
@@ -686,7 +686,7 @@
         stopSpeech();
         if (confirm("集めたスタンプ（W1〜W5、U1〜U5）をリセットしますか？\n（※景品交換状況は消えずに残ります）")) {
             collectedSpots.clear();
-            lastActiveSpot = null; // 記憶から完全に抹消して初期状態に戻す
+            lastActiveSpot = null; 
             saveUserData();
             updateStampDisplayAll();
             switchLang(currentLang);
