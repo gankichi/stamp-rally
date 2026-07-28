@@ -115,18 +115,21 @@
         .course-w .course-title { color: #166534; }
         .course-u .course-title { color: #1e40af; }
 
-        /* スタンプマス目 */
-        .stamp-grid { display: flex;
-            justify-content: space-between; align-items: center; gap: 6px; padding: 5px; overflow-x: auto;
+        /* スタンプマス目（各4マス用に均等配置） */
+        .stamp-grid { 
+            display: flex;
+            justify-content: space-around; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 5px; 
         }
         .stamp-slot {
-            width: 55px;
-            height: 55px; border-radius: 50%; background-color: #ffffff; border: 2px dotted #cccccc;
-            display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999999;
+            width: 60px;
+            height: 60px; border-radius: 50%; background-color: #ffffff; border: 2px dotted #cccccc;
+            display: flex; align-items: center; justify-content: center; font-size: 12px; color: #999999;
             font-weight: bold;
             position: relative; flex-shrink: 0; box-sizing: border-box; cursor: pointer; user-select: none;
         }
-        .stamp-slot.special { border: 2px dashed #a855f7; background-color: #faf5ff; color: #a855f7; font-size: 11px; }
         .stamp-image { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
         
         .stamp-default-mark {
@@ -135,30 +138,20 @@
             color: #ff5a5f; display: flex; align-items: center; justify-content: center; font-size: 14px;
             font-weight: bold; box-sizing: border-box;
         }
-        .stamp-special-mark {
-            width: 100%;
-            height: 100%; border-radius: 50%; background-color: #f3e8ff; border: 2px solid #a855f7;
-            color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 14px;
-            font-weight: bold; box-sizing: border-box;
-        }
 
         /* 選択されたスタンプの赤いハイライト表示 */
         .stamp-slot.active-selection {
             border: 3px solid #ff5a5f !important;
             box-shadow: 0 0 12px rgba(255, 90, 95, 0.8);
-            transform: scale(1.05);
+            transform: scale(1.08);
             transition: all 0.2s ease;
-        }
-        .stamp-slot.special.active-selection {
-            border: 3px solid #a855f7 !important;
-            box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
         }
 
         /* 状態メッセージエリア */
         .status-msg {
-            background-color: #f3f4f6;
+            background-color: #fff5da;
             padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold;
-            margin-top: 10px; border: 1px solid #e5e7eb; min-height: 60px;
+            margin-top: 10px; border: 1px solid #fed7aa; min-height: 60px;
             display: flex; align-items: center;
             justify-content: center; flex-direction: column; gap: 8px;
         }
@@ -240,6 +233,7 @@
         <div class="camera-overlay"></div>
     </div>
 
+    <!-- わくわくコース (W: 1〜4) -->
     <div class="course-section course-w">
         <div class="course-title">🟢 <span id="titleW">わくわくコース</span></div>
         <div class="stamp-grid">
@@ -247,18 +241,17 @@
             <div class="stamp-slot" id="slot-W2" onclick="handleSlotClick('W2')">W2</div>
             <div class="stamp-slot" id="slot-W3" onclick="handleSlotClick('W3')">W3</div>
             <div class="stamp-slot" id="slot-W4" onclick="handleSlotClick('W4')">W4</div>
-            <div class="stamp-slot special" id="slot-W5" onclick="handleSlotClick('W5')">SP</div>
         </div>
     </div>
 
+    <!-- うきうきコース (U: 1〜4) -->
     <div class="course-section course-u">
         <div class="course-title">🔵 <span id="titleU">うきうきコース</span></div>
         <div class="stamp-grid">
             <div class="stamp-slot" id="slot-U1" onclick="handleSlotClick('U1')">U1</div>
             <div class="stamp-slot" id="slot-U2" onclick="handleSlotClick('U2')">U2</div>
             <div class="stamp-slot" id="slot-U3" onclick="handleSlotClick('U3')">U3</div>
-            <div class="stamp-slot" id="slot-U4" onclick="make_clickable_or_not('U4')">U4</div>
-            <div class="stamp-slot special" id="slot-U5" onclick="handleSlotClick('U5')">SP</div>
+            <div class="stamp-slot" id="slot-U4" onclick="handleSlotClick('U4')">U4</div>
         </div>
     </div>
 
@@ -281,26 +274,86 @@
 
 <script>
     // ==========================================
-    // ⚙️ マスタ設定（4カ国語完全対応）
+    // ⚙️ マスタ設定（8施設完全反映・4カ国語対応）
     // ==========================================
     const spotMaster = {
         images: {
-            "W1": "HOW_logo_W1.png", "W2": null, "W3": null, "W4": null, "W5": null,
-            "U1": null, "U2": null, "U3": null, "U4": null, "U5": null
+            "W1": "HOW_logo_W1.png", 
+            "W2": "W2.png", 
+            "W3": "W3.png", 
+            "W4": "W4.png",
+            "U1": "U1.jpg", 
+            "U2": "U2.png", 
+            "U3": "U3.png", 
+            "U4": "U4.jpg"
         },
         languages: {
             ja: {
                 spots: {
-                    "W1": { name: "北九州市立子どもの館", message: "子どもの楽しいが詰まった屋内遊戯施設♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1のヒント】赤のエレベーターで7階へ！受付の近くだよ♪", speechHint: "ダブリューいちのヒント。赤のエレベーターで7階へ！受付の近くだよ♪", speechGet: "きたきゅうしゅうしりつ こどものやかた を獲得したよ！子どもの楽しいが詰まった屋内遊戯施設です。" },
-                    "W2": { name: "施設W2（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W2のヒント】場所のヒントが入ります。", speechHint: "ダブリューにのヒント。場所のヒントが入ります。", speechGet: "施設ダブリューにを獲得したよ！" },
-                    "W3": { name: "施設W3（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W3のヒント】場所のヒントが入ります。", speechHint: "ダブリューさんのヒント。場所のヒントが入ります。", speechGet: "施設ダブリューさんを獲得したよ！" },
-                    "W4": { name: "施設W4（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【W4のヒント】場所のヒントが入ります。", speechHint: "ダブリューよんのヒント。場所のヒントが入ります。", speechGet: "施設ダブリューよんを獲得したよ！" },
-                    "W5": { name: "わくわくスペシャル", message: "特別なスタンプをゲットしたよ！", url: "https://www.kodomo-how.com/", hint: "🔍【W5(SP)のヒント】特別な場所に隠されているよ！", speechHint: "ダブリューご、スペシャルスタンプのヒント。特別な場所に隠されているよ！", speechGet: "わくわくスペシャルスタンプを獲得したよ！" },
-                    "U1": { name: "施設U1（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U1のヒント】場所のヒントが入ります。", speechHint: "ユーいちのヒント。場所のヒントが入ります。", speechGet: "施設ユーいちを獲得したよ！" },
-                    "U2": { name: "施設U2（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U2のヒント】場所のヒントが入ります。", speechHint: "ユーにのヒント。場所のヒントが入ります。", speechGet: "施設ユーにを獲得したよ！" },
-                    "U3": { name: "施設U3（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U3のヒント】場所のヒントが入ります。", speechHint: "ユーさんのヒント。場所のヒントが入ります。", speechGet: "施設ユーさんを獲得したよ！" },
-                    "U4": { name: "施設U4（未定）", message: "紹介文が入ります。", url: "https://www.kodomo-how.com/", hint: "🔍【U4のヒント】場所のヒントが入ります。", speechHint: "ユーよんのヒント。場所のヒントが入ります。", speechGet: "施設ユーよんを獲得したよ！" },
-                    "U5": { name: "うきうきスペシャル", message: "特別なスタンプをゲットしたよ！", url: "https://www.kodomo-how.com/", hint: "🔍【U5(SP)のヒント】特別な場所に隠されているよ！", speechHint: "ユーご、スペシャルスタンプのヒント。特別な場所に隠されているよ！", speechGet: "うきうきスペシャルスタンプを獲得したよ！" }
+                    "W1": { 
+                        name: "北九州市立子どもの館", 
+                        message: "子どもの楽しいが詰まった屋内遊戯施設♪", 
+                        url: "https://www.kodomo-how.com/", 
+                        hint: "🔍【W1のヒント】赤のエレベーターで7階へ！受付の近くだよ♪", 
+                        speechHint: "ダブリューいちのヒント。赤のエレベーターでなな階へ！受付の近くだよ♪", 
+                        speechGet: "きたきゅうしゅうしりつ こどものやかた を獲得したよ！" 
+                    },
+                    "W2": { 
+                        name: "北九州市立ユースステーション", 
+                        message: "ユース（若者・青少年）のためのサードプレイス！", 
+                        url: "https://www.kitaq-youth.com/", 
+                        hint: "🔍【W2のヒント】地下1階の赤いエレベーターの前にあるよ！", 
+                        speechHint: "ダブリューにのヒント。地下いっ階の赤いエレベーターの前にあるよ！", 
+                        speechGet: "きたきゅうしゅうしりつ ユースステーション を獲得したよ！" 
+                    },
+                    "W3": { 
+                        name: "北九州国際交流協会", 
+                        message: "北九州市多文化共生ワンストップインフォメーションセンター", 
+                        url: "https://www.kitaq-koryu.jp/", 
+                        hint: "🔍【W3のヒント】福岡銀行ATMの前だよ～♪", 
+                        speechHint: "ダブリューさんのヒント。福岡銀行エーティーエムの前だよ～♪", 
+                        speechGet: "きたきゅうしゅう こくさいこうりゅうきょうかい を獲得したよ！" 
+                    },
+                    "W4": { 
+                        name: "市民活動サポートセンター", 
+                        message: "NPOや市民活動団体のサポートを行っています", 
+                        url: "https://www.kirakirakitaq.jp/index.php", 
+                        hint: "🔍【W4のヒント】緑のエレベーター３階を降りた正面に！", 
+                        speechHint: "ダブリューよんのヒント。緑のエレベーターさん階を降りた正面に！", 
+                        speechGet: "しみんかつどうサポートセンター を獲得したよ！" 
+                    },
+                    "U1": { 
+                        name: "西部障害者福祉会館", 
+                        message: "障害のある方の活動や暮らしに寄り添いサポートします。", 
+                        url: "https://www.kirakirakitaq.jp/index.php", 
+                        hint: "🔍【U1のヒント】“森の色”の扉を選び５階へ！目の前の受付を見よ！", 
+                        speechHint: "ユーいちのヒント。森の色の扉を選び５階へ！目の前の受付を見よ！", 
+                        speechGet: "せいぶしょうがいしゃふくしかいかん を獲得したよ！" 
+                    },
+                    "U2": { 
+                        name: "若者ワークプラザ北九州・黒崎", 
+                        message: "概ね40歳までの若者・学生と就職氷河期世代のための就職支援拠点", 
+                        url: "https://www.shigotomarugoto.info/wakamono/", 
+                        hint: "🔍【U2のヒント】緑のエレベーター降りて右手側", 
+                        speechHint: "ユーにのヒント。緑のエレベーター降りて右手側。", 
+                        speechGet: "わかものワークプラザきたきゅうしゅう・くろさき を獲得したよ！" 
+                    },
+                    "U3": { 
+                        name: "シルバー人材センター西部出張所", 
+                        message: "健康で働く意欲のある高年齢者をサポートしています。", 
+                        url: "https://kitakyusilver.jp/", 
+                        hint: "🔍【U3のヒント】3Fタリーズコーヒー横", 
+                        speechHint: "ユーさんのヒント。3階タリーズコーヒー横", 
+                        speechGet: "シルバーじんざいセンターせいぶしゅっちょうじょ を獲得したよ！" 
+                    },
+                    "U4": { 
+                        name: "八幡西生涯学習センター", 
+                        message: "まなび、つながり、ひろがる拠点。", 
+                        url: "https://www.hitomirai.jp/", 
+                        hint: "🔍【U4のヒント】カウンターにドラえもんやアンパンマンがいるよ🎵（３階の真ん中）", 
+                        speechHint: "ユーよんのヒント。カウンターにドラえもんやアンパンマンがいるよ🎵（３階の真ん中）", 
+                        speechGet: "やはたにししょうがいがくしゅうセンター を獲得したよ！" 
+                    }
                 },
                 ui: {
                     title: "わくわく スタンプラリー（テスト用）",
@@ -312,25 +365,23 @@
                     clearU: "うきうきコースクリア！引換所で「うきうき景品QR」を読み取ってね！",
                     clearBoth: "両方のコースをクリアしたよ！すごーい！",
                     reset: "最初からやり直す", btnNormal: "👁️ みやすさ：通常（カラー）", btnHigh: "👁️ みやすさ：はっきり（白黒）",
-                    goWeb: "ホームページをみる", stampDefaultText: "済", stampSpecialText: "特",
+                    goWeb: "ホームページをみる", stampDefaultText: "済",
                     giftTitle: "🎁 景品交換状況", giftLabelW: "わくわくコース景品", giftLabelU: "うきうきコース景品",
                     giftYet: "未受け取り", giftDone: "お渡し済み",
                     audioStart: "おんせいガイドを聴く", audioStop: "おんせいを止める",
-                    speechDefault: "各スポットにあるQRコードを読み取るとスタンプが押されるよゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。"
+                    speechDefault: "各スポットにあるQRコードを読み取るとスタンプが押されるよ。ゴール特典の景品は先着順となります。"
                 }
             },
             en: {
                 spots: {
-                    "W1": { name: "Kodomo no Yakata", message: "Indoor play facility filled with child-friendly fun!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W1] Go to the 7th floor via the red elevator! Near reception.", speechHint: "Hint for W 1. Go to the 7th floor via the red elevator! Near reception.", speechGet: "You got Kodomo no Yakata!" },
-                    "W2": { name: "Facility W2", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W2] Location hint here.", speechHint: "Hint for W 2.", speechGet: "You got Facility W 2!" },
-                    "W3": { name: "Facility W3", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W3] Location hint here.", speechHint: "Hint for W 3.", speechGet: "You got Facility W 3!" },
-                    "W4": { name: "Facility W4", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W4] Location hint here.", speechHint: "Hint for W 4.", speechGet: "You got Facility W 4!" },
-                    "W5": { name: "Wakuwaku Special", message: "You got a special stamp!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W5] Hidden in a special place!", speechHint: "Hint for W 5, Special stamp.", speechGet: "You got Wakuwaku Special Stamp!" },
-                    "U1": { name: "Facility U1", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U1] Location hint here.", speechHint: "Hint for U 1.", speechGet: "You got Facility U 1!" },
-                    "U2": { name: "Facility U2", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U2] Location hint here.", speechHint: "Hint for U 2.", speechGet: "You got Facility U 2!" },
-                    "U3": { name: "Facility U3", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U3] Location hint here.", speechHint: "Hint for U 3.", speechGet: "You got Facility U 3!" },
-                    "U4": { name: "Facility U4", message: "Description here.", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U4] Location hint here.", speechHint: "Hint for U 4.", speechGet: "You got Facility U 4!" },
-                    "U5": { name: "Ukiuki Special", message: "You got a special stamp!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint U5] Hidden in a special place!", speechHint: "Hint for U 5, Special stamp.", speechGet: "You got Ukiuki Special Stamp!" }
+                    "W1": { name: "Kodomo no Yakata", message: "Indoor play facility filled with child-friendly fun!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W1] Go to the 7th floor via the red elevator! Near reception.", speechHint: "Hint for W 1. Go to the 7th floor via the red elevator!", speechGet: "You got Kodomo no Yakata!" },
+                    "W2": { name: "Youth Station", message: "Third place for youth!", url: "https://www.kitaq-youth.com/", hint: "🔍[Hint W2] In front of the red elevator on B1 floor!", speechHint: "Hint for W 2.", speechGet: "You got Youth Station!" },
+                    "W3": { name: "Kitakyushu International Association", message: "Multicultural Information Center", url: "https://www.kitaq-koryu.jp/", hint: "🔍[Hint W3] In front of the Fukuoka Bank ATM!", speechHint: "Hint for W 3.", speechGet: "You got International Association!" },
+                    "W4": { name: "Civic Activity Support Center", message: "Supporting NPOs and civic activities", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍[Hint W4] Right in front of the green elevator on the 3rd floor!", speechHint: "Hint for W 4.", speechGet: "You got Support Center!" },
+                    "U1": { name: "Welfare Center for Persons with Disabilities", message: "Supporting daily life and activities", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍[Hint U1] Take the 'Forest Color' door to the 5th floor!", speechHint: "Hint for U 1.", speechGet: "You got Welfare Center!" },
+                    "U2": { name: "Youth Work Plaza", message: "Employment support center for young people", url: "https://www.shigotomarugoto.info/wakamono/", hint: "🔍[Hint U2] Right side after exiting the green elevator", speechHint: "Hint for U 2.", speechGet: "You got Youth Work Plaza!" },
+                    "U3": { name: "Silver Human Resources Center", message: "Supporting senior workers", url: "https://kitakyusilver.jp/", hint: "🔍[Hint U3] Next to Tully's Coffee on the 3rd floor", speechHint: "Hint for U 3.", speechGet: "You got Silver Human Resources Center!" },
+                    "U4": { name: "Yahatanishi Lifelong Learning Center", message: "A place for learning and connecting", url: "https://www.hitomirai.jp/", hint: "🔍[Hint U4] At the counter on the 3rd floor center!", speechHint: "Hint for U 4.", speechGet: "You got Lifelong Learning Center!" }
                 },
                 ui: {
                     title: "Main Stamp Rally", info: "Scan QR codes to collect stamps!",
@@ -340,7 +391,7 @@
                     clearW: "Wakuwaku Course Complete!", clearU: "Ukiuki Course Complete!",
                     clearBoth: "Both Courses Complete!", reset: "Reset All",
                     btnNormal: "👁️ View: Normal", btnHigh: "👁️ View: High Contrast",
-                    goWeb: "Website", stampDefaultText: "OK", stampSpecialText: "SP",
+                    goWeb: "Website", stampDefaultText: "OK",
                     giftTitle: "🎁 Prize Exchange Status", giftLabelW: "Wakuwaku Prize", giftLabelU: "Ukiuki Prize",
                     giftYet: "Not Claimed", giftDone: "Claimed",
                     audioStart: "Listen to Voice Guide", audioStop: "Stop Voice Guide",
@@ -349,16 +400,14 @@
             },
             zh: {
                 spots: {
-                    "W1": { name: "北九州市立儿童馆", message: "充满儿童乐趣的室内游乐设施♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1提示】乘红色电梯到7楼！在接待处附近♪", speechHint: "W 1提示。乘红色电梯到7楼！在接待处附近♪", speechGet: "获得了北九州市立儿童馆！" },
-                    "W2": { name: "设施 W2", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【W2 提示】等待数据中", speechHint: "W 2 提示", speechGet: "获得了设施 W2" },
-                    "W3": { name: "设施 W3", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【W3 提示】等待数据中", speechHint: "W 3 提示", speechGet: "获得了设施 W3" },
-                    "W4": { name: "设施 W4", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【W4 提示】等待数据中", speechHint: "W 4 提示", speechGet: "获得了设施 W4" },
-                    "W5": { name: "欢乐特效", message: "获得了特别印章！", url: "https://www.kodomo-how.com/", hint: "🔍【W5 提示】隐藏在特别的地方♪", speechHint: "W 5 提示", speechGet: "获得了欢乐特效印章！" },
-                    "U1": { name: "设施 U1", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【U1 提示】等待数据中", speechHint: "U 1 提示", speechGet: "获得了设施 U1" },
-                    "U2": { name: "设施 U2", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【U2 提示】等待数据中", speechHint: "U 2 提示", speechGet: "获得了设施 U2" },
-                    "U3": { name: "设施 U3", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【U3 提示】等待数据中", speechHint: "U 3 提示", speechGet: "获得了设施 U3" },
-                    "U4": { name: "设施 U4", message: "准备中", url: "https://www.kodomo-how.com/", hint: "🔍【U4 提示】等待数据中", speechHint: "U 4 提示", speechGet: "获得了设施 U4" },
-                    "U5": { name: "无忧特效", message: "获得了特别印章！", url: "https://www.kodomo-how.com/", hint: "🔍【U5 提示】隐藏在特别的地方♪", speechHint: "U 5 提示", speechGet: "获得了无忧特效印章！" }
+                    "W1": { name: "北九州市立儿童馆", message: "室内游乐设施♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1提示】乘红色电梯到7楼！", speechHint: "W 1提示", speechGet: "获得了北九州市立儿童馆！" },
+                    "W2": { name: "青少年驿站", message: "青少年的空间！", url: "https://www.kitaq-youth.com/", hint: "🔍【W2提示】地下一楼红色电梯前！", speechHint: "W 2提示", speechGet: "获得了青少年驿站！" },
+                    "W3": { name: "北九州国际交流协会", message: "多文化共生咨询中心", url: "https://www.kitaq-koryu.jp/", hint: "🔍【W3提示】福冈银行ATM前♪", speechHint: "W 3提示", speechGet: "获得了国际交流协会！" },
+                    "W4": { name: "市民活动服务中心", message: "支持NPO与市民活动", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍【W4提示】绿色电梯3楼正面！", speechHint: "W 4提示", speechGet: "获得了市民活动服务中心！" },
+                    "U1": { name: "西部残疾人福利会馆", message: "支持残疾人生活的设施", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍【U1提示】选择“森林色”门前往5楼！", speechHint: "U 1提示", speechGet: "获得了残疾人福利会馆！" },
+                    "U2": { name: "青年就业广场", message: "青年就职支援拠点", url: "https://www.shigotomarugoto.info/wakamono/", hint: "🔍【U2提示】绿色电梯出来右侧", speechHint: "U 2提示", speechGet: "获得了青年就业广场！" },
+                    "U3": { name: "银发人才中心", message: "支持高龄者就职", url: "https://kitakyusilver.jp/", hint: "🔍【U3提示】3楼Tully's Coffee旁", speechHint: "U 3提示", speechGet: "获得了银发人才中心！" },
+                    "U4": { name: "八幡西生涯学习中心", message: "学习与交流的基地", url: "https://www.hitomirai.jp/", hint: "🔍【U4提示】3楼中央柜台！", speechHint: "U 4提示", speechGet: "获得了生涯学习中心！" }
                 },
                 ui: {
                     title: "集章活动", info: "扫描各景点的二维码来收集印章吧！",
@@ -366,9 +415,9 @@
                     courseW: "欢乐路线", courseU: "无忧路线",
                     defaultHint: "扫描二维码来收集印章吧！",
                     clearW: "欢乐路线达成！", clearU: "无忧路线达成！",
-                    clearBoth: "两条路线都达成了！", reset: "重新开始",
+                    clearBoth: "两条路线都达成了！", reset: "重新開始",
                     btnNormal: "👁️ 视觉：普通（彩色）", btnHigh: "👁️ 视觉：清晰（黑白）",
-                    goWeb: "访问官方网站", stampDefaultText: "有", stampSpecialText: "特",
+                    goWeb: "访问官方网站", stampDefaultText: "有",
                     giftTitle: "🎁 奖品兑换情况", giftLabelW: "欢乐路线奖品", giftLabelU: "无忧路线奖品",
                     giftYet: "未领取", giftDone: "已领取",
                     audioStart: "听取语音指南", audioStop: "停止语音",
@@ -377,16 +426,14 @@
             },
             ko: {
                 spots: {
-                    "W1": { name: "기타큐슈 시립 어린이 집", message: "어린이의 즐거움이 가득한 실내 놀이 시설♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 힌트】빨간색 엘리베이터를 타고 7층으로! 접수처 근처야♪", speechHint: "W 1 힌트. 빨간색 엘리베이터를 타고 7층으로! 접수처 근처야♪", speechGet: "기타큐슈 시립 어린이 집 스탬프를 획득했습니다!" },
-                    "W2": { name: "시설 W2", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【W2 힌트】데이터 대기 중", speechHint: "W 2 힌트", speechGet: "시설 W2 스탬프를 획득했습니다!" },
-                    "W3": { name: "시설 W3", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【W3 힌트】데이터 대기 중", speechHint: "W 3 힌트", speechGet: "시설 W3 스탬프를 획득했습니다!" },
-                    "W4": { name: "시설 W4", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【W4 힌트】데이터 대기 중", speechHint: "W 4 힌트", speechGet: "시설 W4 스탬프를 획득했습니다!" },
-                    "W5": { name: "두근두근 스페셜", message: "특별한 스탬프를 획득했습니다!", url: "https://www.kodomo-how.com/", hint: "🔍【W5 힌트】특별한 장소에 숨겨져 있어요♪", speechHint: "W 5 힌트", speechGet: "특별한 스탬프를 획득했습니다!" },
-                    "U1": { name: "시설 U1", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【U1 힌트】데이터 대기 중", speechHint: "U 1 힌트", speechGet: "시설 U1 스탬프를 획득했습니다!" },
-                    "U2": { name: "시설 U2", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【U2 힌트】데이터 대기 중", speechHint: "U 2 힌트", speechGet: "시설 U2 스탬프를 획득했습니다!" },
-                    "U3": { name: "시설 U3", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【U3 힌트】데이터 대기 중", speechHint: "U 3 힌트", speechGet: "시설 U3 스탬프를 획득했습니다!" },
-                    "U4": { name: "시설 U4", message: "준비 중", url: "https://www.kodomo-how.com/", hint: "🔍【U4 힌트】데이터 대기 중", speechHint: "U 4 힌트", speechGet: "시설 U4 스탬프를 획득했습니다!" },
-                    "U5": { name: "신나고 스페셜", message: "특별한 스탬프를 획득했습니다!", url: "https://www.kodomo-how.com/", hint: "🔍【U5 힌트】특별한 장소에 숨겨져 있어요♪", speechHint: "U 5 힌트", speechGet: "특별한 스탬프를 획득했습니다!" }
+                    "W1": { name: "기타큐슈 시립 어린이 집", message: "실내 놀이 시설♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 힌트】빨간색 엘리베이터 타고 7층으로!", speechHint: "W 1 힌트", speechGet: "어린이 집 스탬프 획득!" },
+                    "W2": { name: "청소년 스테이션", message: "청소년을 위한 공간!", url: "https://www.kitaq-youth.com/", hint: "🔍【W2 힌트】지하 1층 빨간 엘리베이터 앞!", speechHint: "W 2 힌트", speechGet: "청소년 스테이션 스탬프 획득!" },
+                    "W3": { name: "기타큐슈 국제교류협회", message: "다문화 공생 정보 센터", url: "https://www.kitaq-koryu.jp/", hint: "🔍【W3 힌트】후쿠오카 은행 ATM 앞!", speechHint: "W 3 힌트", speechGet: "국제교류협회 스탬프 획득!" },
+                    "W4": { name: "시민활동 지원센터", message: "시민활동 및 NPO 지원", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍【W4 힌트】초록 엘리베이터 3층 정면!", speechHint: "W 4 힌트", speechGet: "시민활동 지원센터 스탬프 획득!" },
+                    "U1": { name: "서부 장애인 복지회관", message: "장애인 활동 및 생활 지원", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍【U1 힌트】'숲의 색' 문을 통해 5층으로!", speechHint: "U 1 힌트", speechGet: "장애인 복지회관 스탬프 획득!" },
+                    "U2": { name: "청년 워크 프라자", message: "청년 취업 지원 거점", url: "https://www.shigotomarugoto.info/wakamono/", hint: "🔍【U2 힌트】초록 엘리베이터 내리고 오른쪽", speechHint: "U 2 힌트", speechGet: "청년 워크 프라자 스탬프 획득!" },
+                    "U3": { name: "실버 인재 센터", message: "고령자 취업 지원", url: "https://kitakyusilver.jp/", hint: "🔍【U3 힌트】3층 털리스 커피 옆", speechHint: "U 3 힌트", speechGet: "실버 인재 센터 스탬프 획득!" },
+                    "U4": { name: "야하타니시 평생학습센터", message: "배움과 연결의 거점", url: "https://www.hitomirai.jp/", hint: "🔍【U4 힌트】3층 중앙 카운터!", speechHint: "U 4 힌트", speechGet: "평생학습센터 스탬프 획득!" }
                 },
                 ui: {
                     title: "두근두근 스탬프 랠리", info: "각 스팟에 있는 QR 코드를 스캔하면 스탬프가 찍혀요!",
@@ -396,11 +443,11 @@
                     clearW: "두근두근 코스 완료!", clearU: "신나고 코스 완료!",
                     clearBoth: "두 코스를 모두 완료했습니다!", reset: "처음부터 다시 하기",
                     btnNormal: "👁️ 보기: 보통 (컬러)", btnHigh: "👁️ 보기: 또렷하게 (흑백)",
-                    goWeb: "홈페이지 보기", stampDefaultText: "완료", stampSpecialText: "특",
+                    goWeb: "홈페이지 보기", stampDefaultText: "완료",
                     giftTitle: "🎁 경품 교환 상황", giftLabelW: "두근두근 코스 상품", giftLabelU: "신나고 코스 상품",
                     giftYet: "미수령", giftDone: "수령 완료",
                     audioStart: "음성 가이드 듣기", audioStop: "음성 중지",
-                    speechDefault: "각 스팟에 있는 QR 코드를 스캔하면 스탬프가 찍혀요! 상품은 선착순입니다."
+                    speechDefault: "각 스팟에 있는 QR 코드를 스캔하면 스탬フ가 찍혀요!"
                 }
             }
         }
@@ -422,11 +469,11 @@
             synth = window.speechSynthesis;
         }
     } catch(e) {
-        console.log("SpeechSynthesis is not supported or restricted.");
+        console.log("SpeechSynthesis is not supported.");
     }
 
     function loadUserData() {
-        const saved = localStorage.getItem('vaku_rally_data_v6');
+        const saved = localStorage.getItem('vaku_rally_data_v7');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -443,7 +490,7 @@
             spots: Array.from(collectedSpots), lastActive: lastActiveSpot,
             redeemedW: redeemedW, redeemedU: redeemedU
         };
-        localStorage.setItem('vaku_rally_data_v6', JSON.stringify(data));
+        localStorage.setItem('vaku_rally_data_v7', JSON.stringify(data));
     }
 
     function switchLang(lang) {
@@ -497,8 +544,9 @@
         const textUI = spotMaster.languages[currentLang].ui;
         const spotsData = spotMaster.languages[currentLang].spots;
         
-        const wMaster = ["W1", "W2", "W3", "W4", "W5"];
-        const uMaster = ["U1", "U2", "U3", "U4", "U5"];
+        // 4箇所（1〜4）ベースでクリア判定
+        const wMaster = ["W1", "W2", "W3", "W4"];
+        const uMaster = ["U1", "U2", "U3", "U4"];
         const isWComplete = wMaster.every(s => collectedSpots.has(s));
         const isUComplete = uMaster.every(s => collectedSpots.has(s));
 
@@ -542,8 +590,8 @@
             
             let targetText = textUI.speechDefault;
 
-            const wMaster = ["W1", "W2", "W3", "W4", "W5"];
-            const uMaster = ["U1", "U2", "U3", "U4", "U5"];
+            const wMaster = ["W1", "W2", "W3", "W4"];
+            const uMaster = ["U1", "U2", "U3", "U4"];
             const isWComplete = wMaster.every(s => collectedSpots.has(s));
             const isUComplete = uMaster.every(s => collectedSpots.has(s));
 
@@ -600,12 +648,10 @@
     function handleSlotClick(spotCode) {
         lastActiveSpot = spotCode;
         
-        // すべてのマスから選択中の赤い外枠（ハイライト）を消去
         document.querySelectorAll('.stamp-slot').forEach(slot => {
             slot.classList.remove('active-selection');
         });
         
-        // タップされたマスにだけ選択中の赤い外枠（ハイライト）を付与
         const currentSlot = document.getElementById(`slot-${spotCode}`);
         if (currentSlot) {
             currentSlot.classList.add('active-selection');
@@ -614,10 +660,6 @@
         updateMessageArea();
         saveUserData();
         stopSpeech();
-    }
-
-    function make_clickable_or_not(spotCode) {
-        handleSlotClick(spotCode);
     }
 
     function processStampInbound(spotCode) {
@@ -639,7 +681,6 @@
             updateStampSlotVisual(spotCode);
             updateMessageArea();
 
-            // スタンプ獲得時、新しく獲得したマスを自動的にハイライト表示にする
             document.querySelectorAll('.stamp-slot').forEach(slot => slot.classList.remove('active-selection'));
             const currentSlot = document.getElementById(`slot-${spotCode}`);
             if (currentSlot) currentSlot.classList.add('active-selection');
@@ -656,14 +697,10 @@
                 slot.innerHTML = `<img src="${imgPath}" class="stamp-image" alt="${spotCode}">`;
             } else {
                 const textUI = spotMaster.languages[currentLang].ui;
-                if(spotCode.endsWith("5")) {
-                    slot.innerHTML = `<div class="stamp-special-mark">${textUI.stampSpecialText}</div>`;
-                } else {
-                    slot.innerHTML = `<div class="stamp-default-mark">${textUI.stampDefaultText}</div>`;
-                }
+                slot.innerHTML = `<div class="stamp-default-mark">${textUI.stampDefaultText}</div>`;
             }
         } else {
-            slot.innerHTML = spotCode.endsWith("5") ? "SP" : spotCode;
+            slot.innerHTML = spotCode;
         }
     }
 
@@ -690,9 +727,11 @@
                 if(cameraArea) cameraArea.style.display = "block";
                 const scanBtnText = document.getElementById('scanBtnText');
                 if(scanBtnText) scanBtnText.innerText = textUI.scanBtnStop;
+                
+                // テスト用の疑似QR検知機能
                 setTimeout(() => {
                     if (videoStream) {
-                        const wMaster = ["W1", "W2", "W3", "W4", "W5"];
+                        const wMaster = ["W1", "W2", "W3", "W4"];
                         const isWComplete = wMaster.every(s => collectedSpots.has(s));
 
                         if (isWComplete && !redeemedW) {
@@ -730,13 +769,12 @@
 
     function resetRally() {
         stopSpeech();
-        if (confirm("集めたスタンプ（W1〜W5、U1〜U5）をリセットしますか？\n（※景品交換状況は消えずに残ります）")) {
+        if (confirm("集めたスタンプ（W1〜W4、U1〜U4）をリセットしますか？\n（※景品交換状況は消えずに残ります）")) {
             collectedSpots.clear();
             lastActiveSpot = null; 
             saveUserData();
             updateStampDisplayAll();
             
-            // リセット時は全マスの選択（赤いハイライト）表示もクリア
             document.querySelectorAll('.stamp-slot').forEach(slot => {
                 slot.classList.remove('active-selection');
             });
