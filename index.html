@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>わくわく デジタルスタンプラリー（テスト用）</title>
+    <title>ひとみらい★フェスタ スタンプラリー</title>
+    <!-- 📷 QRコード解析用ライブラリ (jsQR) の読み込み -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         /* --- 基本デザイン --- */
         body {
@@ -75,7 +77,25 @@
             display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        h1 { color: #ff5a5f; margin: 10px 0; font-size: 24px; }
+        /* 🖼️ タイトル画像エリア */
+        .header-banner {
+            width: 100%;
+            margin: 10px 0 15px 0;
+        }
+        .top-banner-img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            display: block;
+        }
+        .sub-title-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff5a5f;
+            margin-top: 5px;
+            display: none; /* 日本語以外で補助表示 */
+        }
+
         .info-text {
             background-color: #fff5da;
             padding: 12px; border-radius: 10px; font-size: 14px;
@@ -115,10 +135,10 @@
         .course-w .course-title { color: #166534; }
         .course-u .course-title { color: #1e40af; }
 
-        /* スタンプマス目（各4マス用に均等配置） */
+        /* スタンプマス目 */
         .stamp-grid { 
             display: flex;
-            justify-content: space-around; 
+            justify-style: space-around; 
             align-items: center; 
             gap: 8px; 
             padding: 5px; 
@@ -139,7 +159,7 @@
             font-weight: bold; box-sizing: border-box;
         }
 
-        /* 選択されたスタンプの赤いハイライト表示 */
+        /* 選択されたスタンプのハイライト */
         .stamp-slot.active-selection {
             border: 3px solid #ff5a5f !important;
             box-shadow: 0 0 12px rgba(255, 90, 95, 0.8);
@@ -189,7 +209,7 @@
         body.high-contrast .audio-btn.playing { background-color: #ff5a5f !important; color: #ffffff !important; }
         body.high-contrast .lang-btn { background-color: #333333 !important; color: #ffffff !important; border: 2px solid #ffffff !important; }
         body.high-contrast .lang-btn.active { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #ffffff !important; }
-        body.high-contrast h1 { color: #ffffff !important; }
+        body.high-contrast .sub-title-text { color: #ffffff !important; }
         body.high-contrast .info-text { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
         body.high-contrast .scan-btn { background-color: #ffffff !important; color: #000000 !important; border: 4px solid #ffffff !important; }
         body.high-contrast .course-section { background-color: #000000 !important; border: 4px solid #ffffff !important; }
@@ -218,7 +238,11 @@
         </div>
     </div>
 
-    <h1 id="mainTitle">わくわく スタンプラリー（テスト用）</h1>
+    <!-- 🖼️ タイトル画像エリア -->
+    <div class="header-banner">
+        <img src="top.jpg" alt="ひとみらい★フェスタ スタンプラリー" class="top-banner-img">
+        <div class="sub-title-text" id="subTitleText"></div>
+    </div>
     
     <div class="info-text" id="infoText">
         各スポットにあるQRコードを読み取るとスタンプが押されるよ！<br>
@@ -232,6 +256,8 @@
         <video id="video-preview" autoplay playsinline></video>
         <div class="camera-overlay"></div>
     </div>
+    <!-- 内部処理用キャンバス（非表示） -->
+    <canvas id="qr-canvas" style="display:none;"></canvas>
 
     <!-- わくわくコース (W: 1〜4) -->
     <div class="course-section course-w">
@@ -356,7 +382,7 @@
                     }
                 },
                 ui: {
-                    title: "わくわく スタンプラリー（テスト用）",
+                    title: "ひとみらい★フェスタ スタンプラリー",
                     info: "各スポットにあるQRコードを読み取るとスタンプが押されるよ！ゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。",
                     scanBtnStart: "QRコードを読み取る", scanBtnStop: "カメラを閉じる",
                     courseW: "わくわくコース", courseU: "うきうきコース",
@@ -384,7 +410,7 @@
                     "U4": { name: "Yahatanishi Lifelong Learning Center", message: "A place for learning and connecting", url: "https://www.hitomirai.jp/", hint: "🔍[Hint U4] At the counter on the 3rd floor center!", speechHint: "Hint for U 4.", speechGet: "You got Lifelong Learning Center!" }
                 },
                 ui: {
-                    title: "Main Stamp Rally", info: "Scan QR codes to collect stamps!",
+                    title: "Hitomirai Festa Stamp Rally", info: "Scan QR codes to collect stamps!",
                     scanBtnStart: "Scan QR Code", scanBtnStop: "Close Camera",
                     courseW: "Wakuwaku Course", courseU: "Ukiuki Course",
                     defaultHint: "Scan QR codes to collect stamps!",
@@ -410,7 +436,7 @@
                     "U4": { name: "八幡西生涯学习中心", message: "学习与交流的基地", url: "https://www.hitomirai.jp/", hint: "🔍【U4提示】3楼中央柜台！", speechHint: "U 4提示", speechGet: "获得了生涯学习中心！" }
                 },
                 ui: {
-                    title: "集章活动", info: "扫描各景点的二维码来收集印章吧！",
+                    title: "Hitomirai Festa 集章活动", info: "扫描各景点的二维码来收集印章吧！",
                     scanBtnStart: "扫描二维码", scanBtnStop: "关闭摄像头",
                     courseW: "欢乐路线", courseU: "无忧路线",
                     defaultHint: "扫描二维码来收集印章吧！",
@@ -436,7 +462,7 @@
                     "U4": { name: "야하타니시 평생학습센터", message: "배움과 연결의 거점", url: "https://www.hitomirai.jp/", hint: "🔍【U4 힌트】3층 중앙 카운터!", speechHint: "U 4 힌트", speechGet: "평생학습센터 스탬프 획득!" }
                 },
                 ui: {
-                    title: "두근두근 스탬프 랠리", info: "각 스팟에 있는 QR 코드를 스캔하면 스탬프가 찍혀요!",
+                    title: "Hitomirai Festa 스탬프 랠리", info: "각 스팟에 있는 QR 코드를 스캔하면 스탬프가 찍혀요!",
                     scanBtnStart: "QR 코드 스캔하기", scanBtnStop: "카메라 닫기",
                     courseW: "두근두근 코스", courseU: "신나고 코스",
                     defaultHint: "QR 코드를 스캔하여 스탬프를 모아보세요!",
@@ -461,6 +487,7 @@
     let redeemedW = false; 
     let redeemedU = false; 
     let videoStream = null;
+    let scanAnimationId = null;
 
     // 🔊 音声ブラウザ対応
     let synth = null;
@@ -501,7 +528,18 @@
         if(activeBtn) activeBtn.classList.add('active');
 
         const textUI = spotMaster.languages[currentLang].ui;
-        document.getElementById('mainTitle').innerText = textUI.title;
+        
+        // 外国語切り替え時は画像下に補足テキストを表示
+        const subTitleEl = document.getElementById('subTitleText');
+        if (subTitleEl) {
+            if (currentLang !== 'ja') {
+                subTitleEl.innerText = textUI.title;
+                subTitleEl.style.display = 'block';
+            } else {
+                subTitleEl.style.display = 'none';
+            }
+        }
+
         document.getElementById('infoText').innerHTML = textUI.info;
         document.getElementById('titleW').innerText = textUI.courseW;
         document.getElementById('titleU').innerText = textUI.courseU;
@@ -544,7 +582,6 @@
         const textUI = spotMaster.languages[currentLang].ui;
         const spotsData = spotMaster.languages[currentLang].spots;
         
-        // 4箇所（1〜4）ベースでクリア判定
         const wMaster = ["W1", "W2", "W3", "W4"];
         const uMaster = ["U1", "U2", "U3", "U4"];
         const isWComplete = wMaster.every(s => collectedSpots.has(s));
@@ -665,11 +702,21 @@
     function processStampInbound(spotCode) {
         stopSpeech();
         if (spotCode === "W-GIFT") {
-            if (!redeemedW) { redeemedW = true; saveUserData(); updateGiftBadges(); updateMessageArea(); alert("わくわくコースの景品お渡しを記録しました！"); }
+            if (!redeemedW) { 
+                redeemedW = true; saveUserData(); updateGiftBadges(); updateMessageArea(); 
+                alert("🎉 わくわくコースの景品お渡しを記録しました！"); 
+            } else {
+                alert("わくわくコースの景品はすでにお渡し済みです。");
+            }
             return;
         }
         if (spotCode === "U-GIFT") {
-            if (!redeemedU) { redeemedU = true; saveUserData(); updateGiftBadges(); updateMessageArea(); alert("うきうきコースの景品お渡しを記録しました！"); }
+            if (!redeemedU) { 
+                redeemedU = true; saveUserData(); updateGiftBadges(); updateMessageArea(); 
+                alert("🎉 うきうきコースの景品お渡しを記録しました！"); 
+            } else {
+                alert("うきうきコースの景品はすでにお渡し済みです。");
+            }
             return;
         }
 
@@ -684,6 +731,14 @@
             document.querySelectorAll('.stamp-slot').forEach(slot => slot.classList.remove('active-selection'));
             const currentSlot = document.getElementById(`slot-${spotCode}`);
             if (currentSlot) currentSlot.classList.add('active-selection');
+
+            const spotsData = spotMaster.languages[currentLang].spots;
+            if(spotsData[spotCode]) {
+                alert(`🎉【${spotsData[spotCode].name}】のスタンプをゲットしました！`);
+            }
+        } else {
+            lastActiveSpot = spotCode;
+            updateMessageArea();
         }
     }
 
@@ -708,12 +763,57 @@
         Object.keys(spotMaster.images).forEach(spotCode => { updateStampSlotVisual(spotCode); });
     }
 
+    // 📷 本番用リアルタイムQRコードスキャン関数
+    function tickQRScan() {
+        const video = document.getElementById('video-preview');
+        const canvas = document.getElementById('qr-canvas');
+
+        if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            // jsQRライブラリを使用して解析
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: "dontInvert",
+            });
+
+            if (code && code.data) {
+                // QRコードの中から spot パラメータを取得 (例: https://xxx/?spot=W1)
+                let spotParam = null;
+                try {
+                    const parsedUrl = new URL(code.data);
+                    spotParam = parsedUrl.searchParams.get('spot');
+                } catch(e) {
+                    // フルURLでない場合、直接文字列で判定を試みる
+                    if (code.data.includes('spot=')) {
+                        const match = code.data.match(/spot=([a-zA-Z0-9\-]+)/);
+                        if (match) spotParam = match[1];
+                    }
+                }
+
+                if (spotParam) {
+                    toggleCamera(); // カメラを閉じる
+                    processStampInbound(spotParam.toUpperCase());
+                    return;
+                }
+            }
+        }
+
+        if (videoStream) {
+            scanAnimationId = requestAnimationFrame(tickQRScan);
+        }
+    }
+
     async function toggleCamera() {
         const cameraArea = document.getElementById('cameraArea');
         const video = document.getElementById('video-preview');
         const textUI = spotMaster.languages[currentLang].ui;
 
         if (videoStream) {
+            if (scanAnimationId) cancelAnimationFrame(scanAnimationId);
             videoStream.getTracks().forEach(track => track.stop());
             videoStream = null;
             if(cameraArea) cameraArea.style.display = "none";
@@ -721,35 +821,20 @@
             if(scanBtnText) scanBtnText.innerText = textUI.scanBtnStart;
         } else {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" }, 
+                    audio: false 
+                });
                 videoStream = stream;
                 if(video) video.srcObject = stream;
                 if(cameraArea) cameraArea.style.display = "block";
                 const scanBtnText = document.getElementById('scanBtnText');
                 if(scanBtnText) scanBtnText.innerText = textUI.scanBtnStop;
                 
-                // テスト用の疑似QR検知機能
-                setTimeout(() => {
-                    if (videoStream) {
-                        const wMaster = ["W1", "W2", "W3", "W4"];
-                        const isWComplete = wMaster.every(s => collectedSpots.has(s));
-
-                        if (isWComplete && !redeemedW) {
-                            alert("【テスト】わくわく景品QR (W-GIFT) を検知！");
-                            processStampInbound("W-GIFT");
-                        } else {
-                            const available = Object.keys(spotMaster.images).filter(s => !collectedSpots.has(s));
-                            if (available.length > 0) {
-                                const nextSpot = available[0];
-                                alert(`【テスト】QR「${nextSpot}」を検知！`);
-                                processStampInbound(nextSpot);
-                            }
-                        }
-                        toggleCamera();
-                    }
-                }, 2000);
+                // 本番QRスキャンループを開始
+                scanAnimationId = requestAnimationFrame(tickQRScan);
             } catch (err) {
-                alert("カメラの起動に失敗しました。");
+                alert("カメラの起動に失敗しました。カメラの利用権限を許可してください。");
             }
         }
     }
