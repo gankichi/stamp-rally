@@ -197,7 +197,7 @@
         .gift-row:last-child { border-bottom: none; }
         .gift-name { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
         .gift-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-            text-align: center; }
+            text-align: center; cursor: pointer; user-select: none; }
         .gift-badge.yet { background-color: #e2e8f0; color: #64748b; border: 1px solid #cbd5e1; }
         .gift-badge.done { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-size: 13px; }
 
@@ -291,13 +291,14 @@
         <div class="gift-status-title" id="giftTitle">🎁 景品交換状況</div>
         <div class="gift-row">
             <span class="gift-name">🟢 <span id="giftLabelW">わくわくコース景品</span></span>
-            <span class="gift-badge yet" id="badge-W">未受け取り</span>
+            <span class="gift-badge yet" id="badge-W" onclick="toggleGiftRedeemed('W')">未受け取り</span>
         </div>
         <div class="gift-row">
             <span class="gift-name">🔵 <span id="giftLabelU">うきうきコース景品</span></span>
-            <span class="gift-badge yet" id="badge-U">未受け取り</span>
+            <span class="gift-badge yet" id="badge-U" onclick="toggleGiftRedeemed('U')">未受け取り</span>
         </div>
     </div>
+    <div style="font-size: 11px; color: #b0b0b0; margin-top: -12px; margin-bottom: 5px;" id="giftHintText">※上の受取状況をタップすると切り替えできます（テスト用）</div>
 
     <button class="reset-btn" onclick="resetRally()" id="resetBtn">最初からやり直す</button>
 </div>
@@ -854,6 +855,35 @@
         if(!btn) return;
         const textUI = spotMaster.languages[currentLang].ui;
         btn.innerText = isHighContrast ? textUI.btnNormal : textUI.btnHigh;
+    }
+
+    function toggleGiftRedeemed(course) {
+        stopSpeech();
+        if (course === 'W') {
+            if (redeemedW) {
+                if (confirm("【テスト用】わくわくコース景品を「未受け取り」に戻しますか？")) {
+                    redeemedW = false;
+                    saveUserData(); updateGiftBadges(); updateMessageArea();
+                }
+            } else {
+                if (confirm("【テスト用】わくわくコース景品を「お渡し済み」にしますか？")) {
+                    redeemedW = true;
+                    saveUserData(); updateGiftBadges(); updateMessageArea();
+                }
+            }
+        } else if (course === 'U') {
+            if (redeemedU) {
+                if (confirm("【テスト用】うきうきコース景品を「未受け取り」に戻しますか？")) {
+                    redeemedU = false;
+                    saveUserData(); updateGiftBadges(); updateMessageArea();
+                }
+            } else {
+                if (confirm("【テスト用】うきうきコース景品を「お渡し済み」にしますか？")) {
+                    redeemedU = true;
+                    saveUserData(); updateGiftBadges(); updateMessageArea();
+                }
+            }
+        }
     }
 
     function resetRally() {
