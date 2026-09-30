@@ -1,923 +1,118 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ひとみらい★フェスタ スタンプラリー</title>
-    <!-- 📷 QRコード解析用ライブラリ (jsQR) の読み込み -->
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <style>
-        /* --- 基本デザイン --- */
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f7ebd3;
-            color: #333333;
-            margin: 0;
-            padding: 20px 10px;
-            display: flex;
-            justify-content: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .container {
-            max-width: 500px;
-            width: 100%;
-            background-color: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            padding: 25px 15px;
-            text-align: center;
-            box-sizing: border-box;
-            border: 4px solid #ffcc00;
-        }
-        
-        .control-panel {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-        .lang-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        .lang-btn {
-            background-color: #e0e0e0;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .lang-btn.active { background-color: #ff5a5f; color: white; }
-        
-        /* 🔊 音声・アクセシビリティエリア */
-        .accessibility-box {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .audio-btn {
-            width: 100%;
-            background-color: #0284c7; color: #ffffff; border: none;
-            padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold;
-            display: flex;
-            align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .audio-btn.playing { background-color: #ef4444; }
-        .contrast-toggle-btn {
-            width: 100%;
-            background-color: #222222; color: #ffffff; border: 2px solid #000000;
-            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* 🖼️ タイトル画像エリア */
-        .header-banner {
-            width: 100%;
-            margin: 10px 0 15px 0;
-        }
-        .top-banner-img {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            display: block;
-        }
-        .sub-title-text {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ff5a5f;
-            margin-top: 5px;
-            display: none; /* 日本語以外で補助表示 */
-        }
-
-        .info-text {
-            background-color: #fff5da;
-            padding: 12px; border-radius: 10px; font-size: 14px;
-            margin-bottom: 20px; color: #665544; line-height: 1.5; text-align: left;
-        }
-
-        .scan-btn {
-            background-color: #ff5a5f;
-            color: white; border: none; padding: 14px 28px;
-            font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer;
-            box-shadow: 0 6px 14px rgba(255, 90, 95, 0.4); margin-bottom: 20px;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .camera-container {
-            display: none;
-            position: relative; width: 100%; max-width: 320px;
-            margin: 0 auto 20px auto; border: 3px solid #ff5a5f; border-radius: 12px;
-            overflow: hidden;
-            background-color: #000;
-        }
-        #video-preview { width: 100%; height: auto; display: block; }
-        .camera-overlay {
-            position: absolute;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60%; height: 60%; border: 2px dashed #ff5a5f;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); pointer-events: none;
-        }
-
-        /* コースエリア */
-        .course-section { border-radius: 15px;
-            padding: 15px 10px; margin-bottom: 20px; box-sizing: border-box; }
-        .course-w { background-color: #f0fdf4;
-            border: 2px dashed #4ade80; }
-        .course-u { background-color: #eff6ff; border: 2px dashed #60a5fa; }
-        .course-title { font-weight: bold; font-size: 18px; margin-bottom: 12px; display: flex; align-items: center;
-            justify-content: center; gap: 6px; }
-        .course-w .course-title { color: #166534; }
-        .course-u .course-title { color: #1e40af; }
-
-        /* スタンプマス目 */
-        .stamp-grid { 
-            display: flex;
-            justify-content: center; 
-            align-items: center; 
-            gap: 8px; 
-            padding: 5px; 
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .stamp-slot {
-            width: 100%;
-            max-width: 90px;
-            aspect-ratio: 1 / 1;
-            border-radius: 50%; background-color: #ffffff; border: 2px dotted #cccccc;
-            display: flex; align-items: center; justify-content: center; font-size: 12px; color: #999999;
-            font-weight: bold;
-            position: relative; flex: 1 1 0; box-sizing: border-box; cursor: pointer; user-select: none;
-        }
-        .stamp-image { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        
-        .stamp-default-mark {
-            width: 100%;
-            height: 100%; border-radius: 50%; background-color: #ffebd3; border: 2px solid #ff5a5f;
-            color: #ff5a5f; display: flex; align-items: center; justify-content: center; font-size: 14px;
-            font-weight: bold; box-sizing: border-box;
-        }
-
-        /* 選択されたスタンプのハイライト */
-        .stamp-slot.active-selection {
-            border: 3px solid #ff5a5f !important;
-            box-shadow: 0 0 12px rgba(255, 90, 95, 0.8);
-            transform: scale(1.08);
-            transition: all 0.2s ease;
-        }
-
-        /* 状態メッセージエリア */
-        .status-msg {
-            background-color: #fff5da;
-            padding: 15px; border-radius: 12px; font-size: 14px; font-weight: bold;
-            margin-top: 10px; border: 1px solid #fed7aa; min-height: 60px;
-            display: flex; align-items: center;
-            justify-content: center; flex-direction: column; gap: 8px;
-        }
-        .facility-link-btn {
-            display: inline-block;
-            background-color: #3b82f6; color: white !important; text-decoration: none;
-            padding: 6px 14px; font-size: 13px; border-radius: 20px; margin-top: 5px; font-weight: bold;
-        }
-
-        /* 📦 景品交換状況エリア */
-        .gift-status-section {
-            margin-top: 25px;
-            padding: 15px; background-color: #f8fafc; border: 3px solid #cbd5e1; border-radius: 15px; text-align: left;
-        }
-        .gift-status-title { font-size: 15px; font-weight: bold; color: #334155; margin-bottom: 10px; text-align: center;
-            border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; }
-        .gift-row { display: flex; justify-content: space-between;
-            align-items: center; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; }
-        .gift-row:last-child { border-bottom: none; }
-        .gift-name { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .gift-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-            text-align: center; cursor: pointer; user-select: none; }
-        .gift-badge.yet { background-color: #e2e8f0; color: #64748b; border: 1px solid #cbd5e1; }
-        .gift-badge.done { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; font-size: 13px; }
-
-        .reset-btn { background-color: transparent; color: #9ca3af; border: 1px solid #d1d5db;
-            padding: 5px 15px; font-size: 12px; border-radius: 10px; cursor: pointer; margin-top: 20px;
-        }
-
-        /* --- 高コントラストモード --- */
-        body.high-contrast { background-color: #000000 !important; color: #ffffff !important; }
-        body.high-contrast .container { background-color: #000000 !important; color: #ffffff !important; border: 5px solid #ffffff !important; }
-        body.high-contrast .contrast-toggle-btn { background-color: #ffffff !important; color: #000000 !important; border: 4px solid #ffffff !important; }
-        body.high-contrast .audio-btn { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #ffffff !important; }
-        body.high-contrast .audio-btn.playing { background-color: #ff5a5f !important; color: #ffffff !important; }
-        body.high-contrast .lang-btn { background-color: #333333 !important; color: #ffffff !important; border: 2px solid #ffffff !important; }
-        body.high-contrast .lang-btn.active { background-color: #ffffff !important; color: #000000 !important; border: 3px solid #ffffff !important; }
-        body.high-contrast .sub-title-text { color: #ffffff !important; }
-        body.high-contrast .info-text { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
-        body.high-contrast .scan-btn { background-color: #ffffff !important; color: #000000 !important; border: 4px solid #ffffff !important; }
-        body.high-contrast .course-section { background-color: #000000 !important; border: 4px solid #ffffff !important; }
-        body.high-contrast .stamp-slot { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
-        body.high-contrast .status-msg { background-color: #000000 !important; color: #ffffff !important; border: 3px solid #ffffff !important; }
-        body.high-contrast .gift-status-section { background-color: #000000 !important; border: 3px solid #ffffff !important; }
-        body.high-contrast .gift-status-title { color: #ffffff !important; border-bottom: 2px solid #ffffff !important; }
-        body.high-contrast .gift-badge.yet { background-color: #333333 !important; color: #ffffff !important; border: 1px solid #ffffff !important; }
-        body.high-contrast .gift-badge.done { background-color: #ffffff !important; color: #000000 !important; border: 2px solid #000000 !important; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ひとみらい★フェスタ 2026 終了のお知らせ</title>
+<style>
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f7ebd3;color:#333;margin:0;padding:20px 10px;display:flex;justify-content:center}
+.container{max-width:500px;width:100%;background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.1);padding:25px 15px;text-align:center;box-sizing:border-box;border:4px solid #ffcc00}
+.lang-buttons{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:15px}
+.lang-btn{background:#e0e0e0;border:none;padding:6px 12px;border-radius:15px;cursor:pointer;font-size:13px;font-weight:bold}
+.lang-btn.active{background:#ff5a5f;color:#fff}
+.top-banner-img{width:100%;height:auto;border-radius:12px;display:block;margin:0 0 5px}
+.sub-title-text{font-size:16px;font-weight:bold;color:#ff5a5f;margin:5px 0 15px;display:none}
+.thanks{background:#fff5da;border:1px solid #fed7aa;border-radius:12px;padding:16px 14px;margin:15px 0 12px;font-size:16px;font-weight:bold;line-height:1.7;color:#665544}
+.notice{background:#fee2e2;border:2px solid #fca5a5;color:#b91c1c;border-radius:10px;padding:10px;font-size:14px;font-weight:bold;margin-bottom:22px}
+.course-section{border-radius:15px;padding:15px 10px;margin-bottom:20px;box-sizing:border-box;text-align:left}
+.course-w{background:#f0fdf4;border:2px dashed #4ade80}
+.course-u{background:#eff6ff;border:2px dashed #60a5fa}
+.course-title{font-weight:bold;font-size:18px;margin-bottom:12px;text-align:center}
+.course-w .course-title{color:#166534}
+.course-u .course-title{color:#1e40af}
+.spot{display:flex;gap:12px;align-items:center;background:#fff;border-radius:12px;padding:10px;margin-bottom:10px}
+.spot:last-child{margin-bottom:0}
+.spot img{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #ff5a5f;box-sizing:border-box}
+.spot-name{font-size:15px;font-weight:bold;margin-bottom:2px}
+.spot-msg{font-size:13px;color:#666;line-height:1.5}
+.link-btn{display:inline-block;background:#3b82f6;color:#fff!important;text-decoration:none;padding:5px 14px;font-size:13px;border-radius:20px;margin-top:6px;font-weight:bold}
+.access{width:100%;max-width:320px;margin:0 auto 15px;display:flex;flex-direction:column;gap:8px}
+.audio-btn{width:100%;background:#0284c7;color:#fff;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+.audio-btn.playing{background:#ef4444}
+.contrast-btn{width:100%;background:#222;color:#fff;border:2px solid #000;padding:8px 15px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:bold;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+body.hc{background:#000!important;color:#fff!important}
+body.hc .container{background:#000!important;color:#fff!important;border:5px solid #fff!important}
+body.hc .lang-btn{background:#333!important;color:#fff!important;border:2px solid #fff!important}
+body.hc .lang-btn.active{background:#fff!important;color:#000!important;border:3px solid #fff!important}
+body.hc .audio-btn{background:#fff!important;color:#000!important;border:3px solid #fff!important}
+body.hc .audio-btn.playing{background:#ff5a5f!important;color:#fff!important}
+body.hc .contrast-btn{background:#fff!important;color:#000!important;border:4px solid #fff!important}
+body.hc .sub-title-text{color:#fff!important}
+body.hc .thanks,body.hc .notice{background:#000!important;color:#fff!important;border:3px solid #fff!important}
+body.hc .course-section{background:#000!important;border:4px solid #fff!important}
+body.hc .course-title{color:#fff!important}
+body.hc .spot{background:#000!important;border:2px solid #fff}
+body.hc .spot-msg{color:#fff!important}
+body.hc .spot img{border-color:#fff}
+body.hc .link-btn{background:#fff!important;color:#000!important}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <div class="control-panel">
-        <div class="lang-buttons">
-            <button class="lang-btn active" id="btn-ja" onclick="switchLang('ja')">日本語</button>
-            <button class="lang-btn" id="btn-en" onclick="switchLang('en')">English</button>
-            <button class="lang-btn" id="btn-zh" onclick="switchLang('zh')">简体中文</button>
-            <button class="lang-btn" id="btn-ko" onclick="switchLang('ko')">한국어</button>
-        </div>
-    
-        <div class="accessibility-box">
-            <button class="audio-btn" id="audioBtn" onclick="toggleSpeech()">🔊 <span id="audioBtnText">おんせいガイドを聴く</span></button>
-            <button class="contrast-toggle-btn" onclick="toggleContrast()" id="contrastBtn">👁️ みやすさ：通常（カラー）</button>
-        </div>
-    </div>
-
-    <!-- 🖼️ タイトル画像エリア -->
-    <div class="header-banner">
-        <img src="top.png" alt="ひとみらい★フェスタ スタンプラリー" class="top-banner-img">
-        <div class="sub-title-text" id="subTitleText"></div>
-    </div>
-    
-    <div class="info-text" id="infoText">
-        各スポットにあるQRコードを読み取るとスタンプが押されるよ！<br>
-        ゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。
-    </div>
-
-    <button class="scan-btn" onclick="toggleCamera()" id="scanBtn">
-        📷 <span id="scanBtnText">QRコードを読み取る</span>
-    </button>
-    <div class="camera-container" id="cameraArea">
-        <video id="video-preview" autoplay playsinline></video>
-        <div class="camera-overlay"></div>
-    </div>
-    <!-- 内部処理用キャンバス（非表示） -->
-    <canvas id="qr-canvas" style="display:none;"></canvas>
-
-    <!-- わくわくコース (W: 1〜4) -->
-    <div class="course-section course-w">
-        <div class="course-title">🟢 <span id="titleW">わくわくコース</span></div>
-        <div class="stamp-grid">
-            <div class="stamp-slot" id="slot-W1" onclick="handleSlotClick('W1')">W1</div>
-            <div class="stamp-slot" id="slot-W2" onclick="handleSlotClick('W2')">W2</div>
-            <div class="stamp-slot" id="slot-W3" onclick="handleSlotClick('W3')">W3</div>
-            <div class="stamp-slot" id="slot-W4" onclick="handleSlotClick('W4')">W4</div>
-        </div>
-    </div>
-
-    <!-- うきうきコース (U: 1〜4) -->
-    <div class="course-section course-u">
-        <div class="course-title">🔵 <span id="titleU">うきうきコース</span></div>
-        <div class="stamp-grid">
-            <div class="stamp-slot" id="slot-U1" onclick="handleSlotClick('U1')">U1</div>
-            <div class="stamp-slot" id="slot-U2" onclick="handleSlotClick('U2')">U2</div>
-            <div class="stamp-slot" id="slot-U3" onclick="handleSlotClick('U3')">U3</div>
-            <div class="stamp-slot" id="slot-U4" onclick="handleSlotClick('U4')">U4</div>
-        </div>
-    </div>
-
-    <div class="status-msg" id="statusMsg">QRコードをよみとってスタンプをあつめよう！</div>
-
-    <div class="gift-status-section">
-        <div class="gift-status-title" id="giftTitle">🎁 景品交換状況</div>
-        <div class="gift-row">
-            <span class="gift-name">🟢 <span id="giftLabelW">わくわくコース景品</span></span>
-            <span class="gift-badge yet" id="badge-W" onclick="toggleGiftRedeemed('W')">未受け取り</span>
-        </div>
-        <div class="gift-row">
-            <span class="gift-name">🔵 <span id="giftLabelU">うきうきコース景品</span></span>
-            <span class="gift-badge yet" id="badge-U" onclick="toggleGiftRedeemed('U')">未受け取り</span>
-        </div>
-    </div>
-    <div style="font-size: 11px; color: #b0b0b0; margin-top: -12px; margin-bottom: 5px;" id="giftHintText">※上の受取状況をタップすると切り替えできます（テスト用）</div>
-
-    <button class="reset-btn" onclick="resetRally()" id="resetBtn">最初からやり直す</button>
+  <div class="lang-buttons">
+    <button class="lang-btn active" id="btn-ja" onclick="setLang('ja')">日本語</button>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">English</button>
+    <button class="lang-btn" id="btn-zh" onclick="setLang('zh')">简体中文</button>
+    <button class="lang-btn" id="btn-ko" onclick="setLang('ko')">한국어</button>
+  </div>
+  <div class="access">
+    <button class="audio-btn" id="audioBtn" onclick="toggleSpeech()">🔊 <span id="audioTxt"></span></button>
+    <button class="contrast-btn" id="contrastBtn" onclick="toggleContrast()"></button>
+  </div>
+  <img src="top.png" alt="ひとみらい★フェスタ" class="top-banner-img">
+  <div class="sub-title-text" id="sub"></div>
+  <div class="thanks" id="thanks"></div>
+  <div class="notice" id="notice"></div>
+  <div class="course-section course-w"><div class="course-title" id="titleW"></div><div id="listW"></div></div>
+  <div class="course-section course-u"><div class="course-title" id="titleU"></div><div id="listU"></div></div>
 </div>
-
 <script>
-    // ==========================================
-    // ⚙️ マスタ設定（8施設完全反映・4カ国語対応）
-    // ==========================================
-    const spotMaster = {
-        images: {
-            "W1": "HOW_logo_W1.png", 
-            "W2": "W2.png", 
-            "W3": "W3.png", 
-            "W4": "W4.png",
-            "U1": "U1.jpg", 
-            "U2": "U2.png", 
-            "U3": "U3.png", 
-            "U4": "U4.jpg"
-        },
-        languages: {
-            ja: {
-                spots: {
-                    "W1": { 
-                        name: "北九州市立子どもの館", 
-                        message: "子どもの楽しいが詰まった屋内遊戯施設♪", 
-                        url: "https://www.kodomo-how.com/", 
-                        hint: "🔍【W1のヒント】赤のエレベーターで7階へ！受付の近くだよ♪", 
-                        speechHint: "ダブリューいちのヒント。赤のエレベーターでなな階へ！受付の近くだよ♪", 
-                        speechGet: "きたきゅうしゅうしりつ こどものやかた を獲得したよ！" 
-                    },
-                    "W2": { 
-                        name: "北九州市立ユースステーション", 
-                        message: "ユース（若者・青少年）のためのサードプレイス！", 
-                        url: "https://www.kitaq-youth.com/", 
-                        hint: "🔍【W2のヒント】地下1階の赤いエレベーターの前にあるよ！", 
-                        speechHint: "ダブリューにのヒント。地下いっ階の赤いエレベーターの前にあるよ！", 
-                        speechGet: "きたきゅうしゅうしりつ ユースステーション を獲得したよ！" 
-                    },
-                    "W3": { 
-                        name: "北九州国際交流協会", 
-                        message: "北九州市多文化共生ワンストップインフォメーションセンター", 
-                        url: "https://www.kitaq-koryu.jp/", 
-                        hint: "🔍【W3のヒント】福岡銀行ATMの前だよ～♪", 
-                        speechHint: "ダブリューさんのヒント。福岡銀行エーティーエムの前だよ～♪", 
-                        speechGet: "きたきゅうしゅう こくさいこうりゅうきょうかい を獲得したよ！" 
-                    },
-                    "W4": { 
-                        name: "市民活動サポートセンター", 
-                        message: "NPOや市民活動団体のサポートを行っています", 
-                        url: "https://www.kirakirakitaq.jp/index.php", 
-                        hint: "🔍【W4のヒント】緑のエレベーター３階を降りた正面に！", 
-                        speechHint: "ダブリューよんのヒント。緑のエレベーターさん階を降りた正面に！", 
-                        speechGet: "しみんかつどうサポートセンター を獲得したよ！" 
-                    },
-                    "U1": { 
-                        name: "西部障害者福祉会館", 
-                        message: "障害のある方の活動や暮らしに寄り添いサポートします。", 
-                        url: "https://www.kitaqshinsyo.com/index.php?id=3117", 
-                        hint: "🔍【U1のヒント】“森の色”の扉を選び５階へ！目の前の受付を見よ！", 
-                        speechHint: "ユーいちのヒント。森の色の扉を選び５階へ！目の前の受付を見よ！", 
-                        speechGet: "せいぶしょうがいしゃふくしかいかん を獲得したよ！" 
-                    },
-                    "U2": { 
-                        name: "若者ワークプラザ北九州・黒崎", 
-                        message: "概ね40歳までの若者・学生と就職氷河期世代のための就職支援拠点", 
-                        url: "https://www.shigotomarugoto.info/wakamono/", 
-                        hint: "🔍【U2のヒント】緑のエレベーター降りて右手側", 
-                        speechHint: "ユーにのヒント。緑のエレベーター降りて右手側。", 
-                        speechGet: "わかものワークプラザきたきゅうしゅう・くろさき を獲得したよ！" 
-                    },
-                    "U3": { 
-                        name: "シルバー人材センター西部出張所", 
-                        message: "健康で働く意欲のある高年齢者をサポートしています。", 
-                        url: "https://kitakyusilver.jp/", 
-                        hint: "🔍【U3のヒント】3Fタリーズコーヒー横", 
-                        speechHint: "ユーさんのヒント。3階タリーズコーヒー横", 
-                        speechGet: "シルバーじんざいセンターせいぶしゅっちょうじょ を獲得したよ！" 
-                    },
-                    "U4": { 
-                        name: "八幡西生涯学習センター", 
-                        message: "まなび、つながり、ひろがる拠点。", 
-                        url: "https://www.hitomirai.jp/", 
-                        hint: "🔍【U4のヒント】カウンターにドラえもんやアンパンマンがいるよ🎵（３階の真ん中）", 
-                        speechHint: "ユーよんのヒント。カウンターにドラえもんやアンパンマンがいるよ🎵（３階の真ん中）", 
-                        speechGet: "やはたにししょうがいがくしゅうセンター を獲得したよ！" 
-                    }
-                },
-                ui: {
-                    title: "ひとみらい★フェスタ スタンプラリー",
-                    info: "各スポットにあるQRコードを読み取るとスタンプが押されるよ！ゴール特典の景品は先着順となります。無くなり次第終了となりますのでご了承ください。",
-                    scanBtnStart: "QRコードを読み取る", scanBtnStop: "カメラを閉じる",
-                    courseW: "わくわくコース", courseU: "うきうきコース",
-                    defaultHint: "QRコードをよみとってスタンプをあつめよう！",
-                    clearW: "わくわくコースクリア！引換所で「わくわく景品QR」を読み取ってね！",
-                    clearU: "うきうきコースクリア！引換所で「うきうき景品QR」を読み取ってね！",
-                    clearBoth: "両方のコースをクリアしたよ！すごーい！",
-                    reset: "最初からやり直す", btnNormal: "👁️ みやすさ：通常（カラー）", btnHigh: "👁️ みやすさ：はっきり（白黒）",
-                    goWeb: "ホームページをみる", stampDefaultText: "済",
-                    giftTitle: "🎁 景品交換状況", giftLabelW: "わくわくコース景品", giftLabelU: "うきうきコース景品",
-                    giftYet: "未受け取り", giftDone: "お渡し済み",
-                    audioStart: "おんせいガイドを聴く", audioStop: "おんせいを止める",
-                    speechDefault: "各スポットにあるQRコードを読み取るとスタンプが押されるよ。ゴール特典の景品は先着順となります。"
-                }
-            },
-            en: {
-                spots: {
-                    "W1": { name: "Kodomo no Yakata", message: "Indoor play facility filled with child-friendly fun!", url: "https://www.kodomo-how.com/", hint: "🔍[Hint W1] Go to the 7th floor via the red elevator! Near reception.", speechHint: "Hint for W 1. Go to the 7th floor via the red elevator! It's near the reception desk.", speechGet: "You got Kodomo no Yakata!" },
-                    "W2": { name: "Youth Station", message: "Third place for youth!", url: "https://www.kitaq-youth.com/", hint: "🔍[Hint W2] In front of the red elevator on B1 floor!", speechHint: "Hint for W 2. It's in front of the red elevator on the basement floor.", speechGet: "You got Youth Station!" },
-                    "W3": { name: "Kitakyushu International Association", message: "Kitakyushu City Information Center for Foreigners", url: "https://www.kitaq-koryu.jp/", hint: "🔍[Hint W3] In front of the Fukuoka Bank ATM!", speechHint: "Hint for W 3. It's in front of the Fukuoka Bank ATM.", speechGet: "You got International Association!" },
-                    "W4": { name: "Civic Activity Support Center", message: "Supporting NPOs and civic activities", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍[Hint W4] Right in front of the green elevator on the 3rd floor!", speechHint: "Hint for W 4. It's right in front of the green elevator on the 3rd floor.", speechGet: "You got Support Center!" },
-                    "U1": { name: "Welfare Center for Persons with Disabilities", message: "Supporting daily life and activities", url: "https://www.kitaqshinsyo.com/index.php?id=3117", hint: "🔍[Hint U1] Take the 'Forest Color' door to the 5th floor!", speechHint: "Hint for U 1. Take the Forest Color door to the 5th floor, and look for the reception desk right in front of you.", speechGet: "You got Welfare Center!" },
-                    "U2": { name: "Youth Work Plaza", message: "Employment support center for young people", url: "https://www.shigotomarugoto.info/wakamono/", hint: "🔍[Hint U2] Right side after exiting the green elevator", speechHint: "Hint for U 2. It's on the right side after you exit the green elevator.", speechGet: "You got Youth Work Plaza!" },
-                    "U3": { name: "Silver Human Resources Center", message: "Supporting senior workers", url: "https://kitakyusilver.jp/", hint: "🔍[Hint U3] Next to Tully's Coffee on the 3rd floor", speechHint: "Hint for U 3. It's next to Tully's Coffee on the 3rd floor.", speechGet: "You got Silver Human Resources Center!" },
-                    "U4": { name: "Yahatanishi Lifelong Learning Center", message: "A place for learning and connecting", url: "https://www.hitomirai.jp/", hint: "🔍[Hint U4] At the counter on the 3rd floor center!", speechHint: "Hint for U 4. Look for the counter in the middle of the 3rd floor.", speechGet: "You got Lifelong Learning Center!" }
-                },
-                ui: {
-                    title: "Hitomirai Festa Stamp Rally", info: "Rewards are available on a first-come, first-served basis, while supplies last.",
-                    scanBtnStart: "Scan QR Code", scanBtnStop: "Close Camera",
-                    courseW: "Wakuwaku Course", courseU: "Ukiuki Course",
-                    defaultHint: "Scan QR codes to collect stamps!",
-                    clearW: "Wakuwaku Course Complete!", clearU: "Ukiuki Course Complete!",
-                    clearBoth: "Both Courses Complete!", reset: "Reset All",
-                    btnNormal: "👁️ View: Normal", btnHigh: "👁️ View: High Contrast",
-                    goWeb: "Website", stampDefaultText: "OK",
-                    giftTitle: "🎁 Prize Exchange Status", giftLabelW: "Wakuwaku Prize", giftLabelU: "Ukiuki Prize",
-                    giftYet: "Not Claimed", giftDone: "Claimed",
-                    audioStart: "Listen to the Audio Guide", audioStop: "Stop the Audio Guide",
-                    speechDefault: "Rewards are available on a first-come, first-served basis, while supplies last."
-                }
-            },
-            zh: {
-                spots: {
-                    "W1": { name: "北九州市立儿童馆", message: "室内游乐设施♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1提示】乘红色电梯到7楼！", speechHint: "W 1 提示。乘坐红色电梯到7楼，就在前台附近。", speechGet: "获得了北九州市立儿童馆！" },
-                    "W2": { name: "青少年驿站", message: "青少年的空间！", url: "https://www.kitaq-youth.com/", hint: "🔍【W2提示】地下一楼红色电梯前！", speechHint: "W 2 提示。就在地下一楼红色电梯前面。", speechGet: "获得了青少年驿站！" },
-                    "W3": { name: "北九州国际交流协会", message: "北九州市 外国人咨询中心", url: "https://www.kitaq-koryu.jp/", hint: "🔍【W3提示】福冈银行ATM前♪", speechHint: "W 3 提示。就在福冈银行ATM前面。", speechGet: "获得了国际交流协会！" },
-                    "W4": { name: "市民活动服务中心", message: "支持NPO与市民活动", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍【W4提示】绿色电梯3楼正面！", speechHint: "W 4 提示。就在绿色电梯3楼正面。", speechGet: "获得了市民活动服务中心！" },
-                    "U1": { name: "西部残疾人福利会馆", message: "支持残疾人生活的设施", url: "https://www.kitaqshinsyo.com/index.php?id=3117", hint: "🔍【U1提示】选择“森林色”门前往5楼！", speechHint: "U 1 提示。选择森林色的门前往5楼，前台就在正对面。", speechGet: "获得了残疾人福利会馆！" },
-                    "U2": { name: "青年就业广场", message: "青年就职支援拠点", url: "https://www.shigotomarugoto.info/wakamono/", hint: "🔍【U2提示】绿色电梯出来右侧", speechHint: "U 2 提示。从绿色电梯出来后在右侧。", speechGet: "获得了青年就业广场！" },
-                    "U3": { name: "银发人才中心", message: "支持高龄者就职", url: "https://kitakyusilver.jp/", hint: "🔍【U3提示】3楼Tully's Coffee旁", speechHint: "U 3 提示。就在3楼Tully's Coffee旁边。", speechGet: "获得了银发人才中心！" },
-                    "U4": { name: "八幡西生涯学习中心", message: "学习与交流的基地", url: "https://www.hitomirai.jp/", hint: "🔍【U4提示】3楼中央柜台！", speechHint: "U 4 提示。就在3楼中央的柜台。", speechGet: "获得了生涯学习中心！" }
-                },
-                ui: {
-                    title: "Hitomirai Festa 集章活动", info: "扫描各景点的二维码来收集印章吧！",
-                    scanBtnStart: "扫描二维码", scanBtnStop: "关闭摄像头",
-                    courseW: "欢乐路线", courseU: "无忧路线",
-                    defaultHint: "扫描二维码来收集印章吧！",
-                    clearW: "欢乐路线达成！", clearU: "无忧路线达成！",
-                    clearBoth: "两条路线都达成了！", reset: "重新開始",
-                    btnNormal: "👁️ 视觉：普通（彩色）", btnHigh: "👁️ 视觉：清晰（黑白）",
-                    goWeb: "访问官方网站", stampDefaultText: "有",
-                    giftTitle: "🎁 奖品兑换情况", giftLabelW: "欢乐路线奖品", giftLabelU: "无忧路线奖品",
-                    giftYet: "未领取", giftDone: "已领取",
-                    audioStart: "听取语音指南", audioStop: "停止语音",
-                    speechDefault: "扫描各景点的二维码来收集印章吧！奖品先到先得。"
-                }
-            },
-            ko: {
-                spots: {
-                    "W1": { name: "기타큐슈 시립 어린이 집", message: "실내 놀이 시설♪", url: "https://www.kodomo-how.com/", hint: "🔍【W1 힌트】빨간색 엘리베이터 타고 7층으로!", speechHint: "W 1 힌트. 빨간색 엘리베이터를 타고 7층으로 가세요. 접수처 근처입니다.", speechGet: "어린이 집 스탬프 획득!" },
-                    "W2": { name: "청소년 스테이션", message: "청소년을 위한 공간!", url: "https://www.kitaq-youth.com/", hint: "🔍【W2 힌트】지하 1층 빨간 엘리베이터 앞!", speechHint: "W 2 힌트. 지하 1층 빨간 엘리베이터 앞에 있습니다.", speechGet: "청소년 스테이션 스탬프 획득!" },
-                    "W3": { name: "기타큐슈 국제교류협회", message: "외국인 인포메이션센터", url: "https://www.kitaq-koryu.jp/", hint: "🔍【W3 힌트】후쿠오카 은행 ATM 앞!", speechHint: "W 3 힌트. 후쿠오카 은행 ATM 앞에 있습니다.", speechGet: "국제교류협회 스탬프 획득!" },
-                    "W4": { name: "시민활동 지원센터", message: "시민활동 및 NPO 지원", url: "https://www.kirakirakitaq.jp/index.php", hint: "🔍【W4 힌트】초록 엘리베이터 3층 정면!", speechHint: "W 4 힌트. 초록 엘리베이터 3층 정면에 있습니다.", speechGet: "시민활동 지원센터 스탬프 획득!" },
-                    "U1": { name: "서부 장애인 복지회관", message: "장애인 활동 및 생활 지원", url: "https://www.kitaqshinsyo.com/index.php?id=3117", hint: "🔍【U1 힌트】'숲의 색' 문을 통해 5층으로!", speechHint: "U 1 힌트. 숲의 색 문을 통해 5층으로 가면, 바로 앞에 접수처가 있습니다.", speechGet: "장애인 복지회관 스탬프 획득!" },
-                    "U2": { name: "청년 워크 프라자", message: "청년 취업 지원 거점", url: "https://www.shigotomarugoto.info/wakamono/", hint: "🔍【U2 힌트】초록 엘리베이터 내리고 오른쪽", speechHint: "U 2 힌트. 초록 엘리베이터에서 내려서 오른쪽에 있습니다.", speechGet: "청년 워크 프라자 스탬프 획득!" },
-                    "U3": { name: "실버 인재 센터", message: "고령자 취업 지원", url: "https://kitakyusilver.jp/", hint: "🔍【U3 힌트】3층 털리스 커피 옆", speechHint: "U 3 힌트. 3층 털리스 커피 옆에 있습니다.", speechGet: "실버 인재 센터 스탬프 획득!" },
-                    "U4": { name: "야하타니시 평생학습센터", message: "배움과 연결의 거점", url: "https://www.hitomirai.jp/", hint: "🔍【U4 힌트】3층 중앙 카운터!", speechHint: "U 4 힌트. 3층 중앙에 있는 카운터를 찾아보세요.", speechGet: "평생학습센터 스탬프 획득!" }
-                },
-                ui: {
-                    title: "Hitomirai Festa 스탬프 랠리", info: "각 스팟에 있는 QR 코드를 스캔하면 스탬프가 찍혀요!",
-                    scanBtnStart: "QR 코드 스캔하기", scanBtnStop: "카메라 닫기",
-                    courseW: "두근두근 코스", courseU: "신나고 코스",
-                    defaultHint: "QR 코드를 스캔하여 스탬프를 모아보세요!",
-                    clearW: "두근두근 코스 완료!", clearU: "신나고 코스 완료!",
-                    clearBoth: "두 코스를 모두 완료했습니다!", reset: "처음부터 다시 하기",
-                    btnNormal: "👁️ 보기: 보통 (컬러)", btnHigh: "👁️ 보기: 또렷하게 (흑백)",
-                    goWeb: "홈페이지 보기", stampDefaultText: "완료",
-                    giftTitle: "🎁 경품 교환 상황", giftLabelW: "두근두근 코스 상품", giftLabelU: "신나고 코스 상품",
-                    giftYet: "미수령", giftDone: "수령 완료",
-                    audioStart: "음성 가이드 듣기", audioStop: "음성 중지",
-                    speechDefault: "각 스팟에 있는 QR 코드를 스캔하면 스탬프가 찍혀요!"
-                }
-            }
-        }
-    };
-
-    // --- 内部変数 ---
-    let currentLang = 'ja';
-    let isHighContrast = false;
-    let lastActiveSpot = null;          
-    let collectedSpots = new Set();  
-    let redeemedW = false; 
-    let redeemedU = false; 
-    let videoStream = null;
-    let scanAnimationId = null;
-
-    // 🔊 音声ブラウザ対応
-    let synth = null;
-    try {
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            synth = window.speechSynthesis;
-        }
-    } catch(e) {
-        console.log("SpeechSynthesis is not supported.");
-    }
-
-    function loadUserData() {
-        const saved = localStorage.getItem('vaku_rally_data_v7');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                collectedSpots = new Set(parsed.spots || []);
-                lastActiveSpot = parsed.lastActive || null;
-                redeemedW = parsed.redeemedW || false;
-                redeemedU = parsed.redeemedU || false;
-            } catch(e) {}
-        }
-    }
-
-    function saveUserData() {
-        const data = {
-            spots: Array.from(collectedSpots), lastActive: lastActiveSpot,
-            redeemedW: redeemedW, redeemedU: redeemedU
-        };
-        localStorage.setItem('vaku_rally_data_v7', JSON.stringify(data));
-    }
-
-    function switchLang(lang) {
-        stopSpeech();
-        currentLang = spotMaster.languages[lang] ? lang : 'ja';
-        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.getElementById(`btn-${currentLang}`);
-        if(activeBtn) activeBtn.classList.add('active');
-
-        const textUI = spotMaster.languages[currentLang].ui;
-        
-        // 外国語切り替え時は画像下に補足テキストを表示
-        const subTitleEl = document.getElementById('subTitleText');
-        if (subTitleEl) {
-            if (currentLang !== 'ja') {
-                subTitleEl.innerText = textUI.title;
-                subTitleEl.style.display = 'block';
-            } else {
-                subTitleEl.style.display = 'none';
-            }
-        }
-
-        document.getElementById('infoText').innerHTML = textUI.info;
-        document.getElementById('titleW').innerText = textUI.courseW;
-        document.getElementById('titleU').innerText = textUI.courseU;
-        document.getElementById('resetBtn').innerText = textUI.reset;
-        document.getElementById('giftTitle').innerText = textUI.giftTitle;
-        document.getElementById('giftLabelW').innerText = textUI.giftLabelW;
-        document.getElementById('giftLabelU').innerText = textUI.giftLabelU;
-        
-        if (videoStream) {
-            document.getElementById('scanBtnText').innerText = textUI.scanBtnStop;
-        } else {
-            document.getElementById('scanBtnText').innerText = textUI.scanBtnStart;
-        }
-        
-        updateStampDisplayAll();
-        updateGiftBadges();
-        updateMessageArea();
-        updateContrastButtonText();
-        updateAudioButtonText();
-    }
-
-    function updateGiftBadges() {
-        const textUI = spotMaster.languages[currentLang].ui;
-        const badgeW = document.getElementById('badge-W');
-        const badgeU = document.getElementById('badge-U');
-
-        if(badgeW) {
-            badgeW.innerText = redeemedW ? textUI.giftDone : textUI.giftYet;
-            badgeW.className = redeemedW ? "gift-badge done" : "gift-badge yet";
-        }
-        if(badgeU) {
-            badgeU.innerText = redeemedU ? textUI.giftDone : textUI.giftYet;
-            badgeU.className = redeemedU ? "gift-badge done" : "gift-badge yet";
-        }
-    }
-
-    function updateMessageArea() {
-        const statusEl = document.getElementById('statusMsg');
-        if(!statusEl) return;
-        const textUI = spotMaster.languages[currentLang].ui;
-        const spotsData = spotMaster.languages[currentLang].spots;
-        
-        const wMaster = ["W1", "W2", "W3", "W4"];
-        const uMaster = ["U1", "U2", "U3", "U4"];
-        const isWComplete = wMaster.every(s => collectedSpots.has(s));
-        const isUComplete = uMaster.every(s => collectedSpots.has(s));
-
-        if (isWComplete && isUComplete && !redeemedW && !redeemedU) {
-            statusEl.innerHTML = `<strong>${textUI.clearBoth}</strong>`; return;
-        }
-        if (isWComplete && !redeemedW) {
-            statusEl.innerHTML = `<strong>${textUI.clearW}</strong>`; return;
-        }
-        if (isUComplete && !redeemedU) {
-            statusEl.innerHTML = `<strong>${textUI.clearU}</strong>`; return;
-        }
-
-        if (lastActiveSpot && spotsData[lastActiveSpot]) {
-            const detail = spotsData[lastActiveSpot];
-            if (collectedSpots.has(lastActiveSpot)) {
-                statusEl.innerHTML = `
-                    <div><strong>🎉【${detail.name}】GET!</strong></div>
-                    <div style="font-size: 13px; font-weight: normal; color: #666; margin: 2px 0;">${detail.message}</div>
-                    <a href="${detail.url}" target="_blank" class="facility-link-btn">${textUI.goWeb} 🔗</a>
-                `;
-            } else {
-                statusEl.innerText = detail.hint;
-            }
-        } else {
-            statusEl.innerText = textUI.defaultHint;
-        }
-    }
-
-    function toggleSpeech() {
-        if (!synth) { alert("このブラウザまたは画面は音声読み上げに対応していません。"); return; }
-
-        try {
-            if (synth.speaking) {
-                stopSpeech();
-                return;
-            }
-
-            const textUI = spotMaster.languages[currentLang].ui;
-            const spotsData = spotMaster.languages[currentLang].spots;
-            
-            let targetText = textUI.speechDefault;
-
-            const wMaster = ["W1", "W2", "W3", "W4"];
-            const uMaster = ["U1", "U2", "U3", "U4"];
-            const isWComplete = wMaster.every(s => collectedSpots.has(s));
-            const isUComplete = uMaster.every(s => collectedSpots.has(s));
-
-            if (isWComplete && !redeemedW) {
-                targetText = textUI.clearW;
-            } else if (isUComplete && !redeemedU) {
-                targetText = textUI.clearU;
-            } else if (lastActiveSpot && spotsData[lastActiveSpot]) {
-                if (collectedSpots.has(lastActiveSpot)) {
-                    targetText = spotsData[lastActiveSpot].speechGet;
-                } else {
-                    targetText = spotsData[lastActiveSpot].speechHint;
-                }
-            }
-
-            if (typeof SpeechSynthesisUtterance === 'undefined') return;
-            const utter = new SpeechSynthesisUtterance(targetText);
-            
-            if (currentLang === 'ja') utter.lang = 'ja-JP';
-            else if (currentLang === 'en') utter.lang = 'en-US';
-            else if (currentLang === 'zh') utter.lang = 'zh-CN';
-            else if (currentLang === 'ko') utter.lang = 'ko-KR';
-
-            utter.rate = 0.95;
-            utter.onend = () => { updateAudioButtonText(); };
-            utter.onerror = () => { updateAudioButtonText(); };
-
-            const audioBtn = document.getElementById('audioBtn');
-            const audioBtnText = document.getElementById('audioBtnText');
-            if(audioBtn) audioBtn.classList.add('playing');
-            if(audioBtnText) audioBtnText.innerText = textUI.audioStop;
-            synth.speak(utter);
-        } catch(e) {
-            console.log("Speech failed", e);
-        }
-    }
-
-    function stopSpeech() {
-        try {
-            if (synth && synth.speaking) { synth.cancel(); }
-        } catch(e) {}
-        updateAudioButtonText();
-    }
-
-    function updateAudioButtonText() {
-        const audioBtnText = document.getElementById('audioBtnText');
-        if (!audioBtnText) return;
-        const textUI = spotMaster.languages[currentLang].ui;
-        const btn = document.getElementById('audioBtn');
-        if(btn) btn.classList.remove('playing');
-        audioBtnText.innerText = textUI.audioStart;
-    }
-
-    function handleSlotClick(spotCode) {
-        lastActiveSpot = spotCode;
-        
-        document.querySelectorAll('.stamp-slot').forEach(slot => {
-            slot.classList.remove('active-selection');
-        });
-        
-        const currentSlot = document.getElementById(`slot-${spotCode}`);
-        if (currentSlot) {
-            currentSlot.classList.add('active-selection');
-        }
-
-        updateMessageArea();
-        saveUserData();
-        stopSpeech();
-    }
-
-    function processStampInbound(spotCode) {
-        stopSpeech();
-        if (spotCode === "W-GIFT") {
-            if (!redeemedW) { 
-                redeemedW = true; saveUserData(); updateGiftBadges(); updateMessageArea(); 
-                alert("🎉 わくわくコースの景品お渡しを記録しました！"); 
-            } else {
-                alert("わくわくコースの景品はすでにお渡し済みです。");
-            }
-            return;
-        }
-        if (spotCode === "U-GIFT") {
-            if (!redeemedU) { 
-                redeemedU = true; saveUserData(); updateGiftBadges(); updateMessageArea(); 
-                alert("🎉 うきうきコースの景品お渡しを記録しました！"); 
-            } else {
-                alert("うきうきコースの景品はすでにお渡し済みです。");
-            }
-            return;
-        }
-
-        if (!spotMaster.images.hasOwnProperty(spotCode)) return;
-        if (!collectedSpots.has(spotCode)) {
-            collectedSpots.add(spotCode);
-            lastActiveSpot = spotCode;
-            saveUserData();
-            updateStampSlotVisual(spotCode);
-            updateMessageArea();
-
-            document.querySelectorAll('.stamp-slot').forEach(slot => slot.classList.remove('active-selection'));
-            const currentSlot = document.getElementById(`slot-${spotCode}`);
-            if (currentSlot) currentSlot.classList.add('active-selection');
-
-            const spotsData = spotMaster.languages[currentLang].spots;
-            if(spotsData[spotCode]) {
-                alert(`🎉【${spotsData[spotCode].name}】のスタンプをゲットしました！`);
-            }
-        } else {
-            lastActiveSpot = spotCode;
-            updateMessageArea();
-        }
-    }
-
-    function updateStampSlotVisual(spotCode) {
-        const slot = document.getElementById(`slot-${spotCode}`);
-        if (!slot) return;
-
-        if (collectedSpots.has(spotCode)) {
-            const imgPath = spotMaster.images[spotCode];
-            if (imgPath) {
-                slot.innerHTML = `<img src="${imgPath}" class="stamp-image" alt="${spotCode}">`;
-            } else {
-                const textUI = spotMaster.languages[currentLang].ui;
-                slot.innerHTML = `<div class="stamp-default-mark">${textUI.stampDefaultText}</div>`;
-            }
-        } else {
-            slot.innerHTML = spotCode;
-        }
-    }
-
-    function updateStampDisplayAll() {
-        Object.keys(spotMaster.images).forEach(spotCode => { updateStampSlotVisual(spotCode); });
-    }
-
-    // 📷 本番用リアルタイムQRコードスキャン関数
-    function tickQRScan() {
-        const video = document.getElementById('video-preview');
-        const canvas = document.getElementById('qr-canvas');
-
-        if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
-            canvas.height = video.videoHeight;
-            canvas.width = video.videoWidth;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            // jsQRライブラリを使用して解析
-            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                inversionAttempts: "dontInvert",
-            });
-
-            if (code && code.data) {
-                // QRコードの中から spot パラメータを取得 (例: https://xxx/?spot=W1)
-                let spotParam = null;
-                try {
-                    const parsedUrl = new URL(code.data);
-                    spotParam = parsedUrl.searchParams.get('spot');
-                } catch(e) {
-                    // フルURLでない場合、直接文字列で判定を試みる
-                    if (code.data.includes('spot=')) {
-                        const match = code.data.match(/spot=([a-zA-Z0-9\-]+)/);
-                        if (match) spotParam = match[1];
-                    }
-                }
-
-                if (spotParam) {
-                    toggleCamera(); // カメラを閉じる
-                    processStampInbound(spotParam.toUpperCase());
-                    return;
-                }
-            }
-        }
-
-        if (videoStream) {
-            scanAnimationId = requestAnimationFrame(tickQRScan);
-        }
-    }
-
-    async function toggleCamera() {
-        const cameraArea = document.getElementById('cameraArea');
-        const video = document.getElementById('video-preview');
-        const textUI = spotMaster.languages[currentLang].ui;
-
-        if (videoStream) {
-            if (scanAnimationId) cancelAnimationFrame(scanAnimationId);
-            videoStream.getTracks().forEach(track => track.stop());
-            videoStream = null;
-            if(cameraArea) cameraArea.style.display = "none";
-            const scanBtnText = document.getElementById('scanBtnText');
-            if(scanBtnText) scanBtnText.innerText = textUI.scanBtnStart;
-        } else {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" }, 
-                    audio: false 
-                });
-                videoStream = stream;
-                if(video) video.srcObject = stream;
-                if(cameraArea) cameraArea.style.display = "block";
-                const scanBtnText = document.getElementById('scanBtnText');
-                if(scanBtnText) scanBtnText.innerText = textUI.scanBtnStop;
-                
-                // 本番QRスキャンループを開始
-                scanAnimationId = requestAnimationFrame(tickQRScan);
-            } catch (err) {
-                alert("カメラの起動に失敗しました。カメラの利用権限を許可してください。");
-            }
-        }
-    }
-
-    function toggleContrast() {
-        isHighContrast = !isHighContrast;
-        document.body.classList.toggle('high-contrast', isHighContrast);
-        updateContrastButtonText();
-    }
-
-    function updateContrastButtonText() {
-        const btn = document.getElementById('contrastBtn');
-        if(!btn) return;
-        const textUI = spotMaster.languages[currentLang].ui;
-        btn.innerText = isHighContrast ? textUI.btnNormal : textUI.btnHigh;
-    }
-
-    function toggleGiftRedeemed(course) {
-        stopSpeech();
-        if (course === 'W') {
-            if (redeemedW) {
-                if (confirm("【テスト用】わくわくコース景品を「未受け取り」に戻しますか？")) {
-                    redeemedW = false;
-                    saveUserData(); updateGiftBadges(); updateMessageArea();
-                }
-            } else {
-                if (confirm("【テスト用】わくわくコース景品を「お渡し済み」にしますか？")) {
-                    redeemedW = true;
-                    saveUserData(); updateGiftBadges(); updateMessageArea();
-                }
-            }
-        } else if (course === 'U') {
-            if (redeemedU) {
-                if (confirm("【テスト用】うきうきコース景品を「未受け取り」に戻しますか？")) {
-                    redeemedU = false;
-                    saveUserData(); updateGiftBadges(); updateMessageArea();
-                }
-            } else {
-                if (confirm("【テスト用】うきうきコース景品を「お渡し済み」にしますか？")) {
-                    redeemedU = true;
-                    saveUserData(); updateGiftBadges(); updateMessageArea();
-                }
-            }
-        }
-    }
-
-    function resetRally() {
-        stopSpeech();
-        if (confirm("集めたスタンプ（W1〜W4、U1〜U4）をリセットしますか？\n（※景品交換状況は消えずに残ります）")) {
-            collectedSpots.clear();
-            lastActiveSpot = null; 
-            saveUserData();
-            updateStampDisplayAll();
-            
-            document.querySelectorAll('.stamp-slot').forEach(slot => {
-                slot.classList.remove('active-selection');
-            });
-            
-            switchLang(currentLang);
-        }
-    }
-
-    function checkUrlParameter() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const spotCode = urlParams.get('spot');
-        if (spotCode) {
-            setTimeout(() => {
-                processStampInbound(spotCode.toUpperCase());
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }, 300);
-        }
-    }
-
-    // 初期化処理
-    loadUserData();
-    switchLang('ja');
-    checkUrlParameter();
+const imgs={W1:"HOW_logo_W1.png",W2:"W2.png",W3:"W3.png",W4:"W4.png",U1:"U1.jpg",U2:"U2.png",U3:"U3.png",U4:"U4.jpg"};
+const urls={W1:"https://www.kodomo-how.com/",W2:"https://www.kitaq-youth.com/",W3:"https://www.kitaq-koryu.jp/",W4:"https://www.kirakirakitaq.jp/index.php",U1:"https://www.kitaqshinsyo.com/index.php?id=3117",U2:"https://www.shigotomarugoto.info/wakamono/",U3:"https://kitakyusilver.jp/",U4:"https://www.hitomirai.jp/"};
+const L={
+ja:{as:"おんせいガイドを聴く",ap:"おんせいを止める",cn:"👁️ みやすさ：通常（カラー）",ch:"👁️ みやすさ：はっきり（白黒）",sp:"2026年のひとみらいフェスタは終了しました。たくさんのご参加ありがとうございました。来年もぜひご参加ください。このページは、10月23日、金曜日以降は見れなくなります。",vl:"ja-JP",sub:"",thanks:"2026年のひとみらいフェスタは終了しました。<br>たくさんのご参加ありがとうございました。<br>来年もぜひご参加ください。",notice:"このページは10/23（金）以降は見れなくなります。",cw:"🟢 わくわくコース",cu:"🔵 うきうきコース",go:"ホームページをみる 🔗",
+s:{W1:["北九州市立子どもの館","子どもの楽しいが詰まった屋内遊戯施設♪"],W2:["北九州市立ユースステーション","ユース（若者・青少年）のためのサードプレイス！"],W3:["北九州国際交流協会","北九州市多文化共生ワンストップインフォメーションセンター"],W4:["市民活動サポートセンター","NPOや市民活動団体のサポートを行っています"],U1:["西部障害者福祉会館","障害のある方の活動や暮らしに寄り添いサポートします。"],U2:["若者ワークプラザ北九州・黒崎","概ね40歳までの若者・学生と就職氷河期世代のための就職支援拠点"],U3:["シルバー人材センター西部出張所","健康で働く意欲のある高年齢者をサポートしています。"],U4:["八幡西生涯学習センター","まなび、つながり、ひろがる拠点。"]}},
+en:{as:"Listen to the Audio Guide",ap:"Stop the Audio Guide",cn:"👁️ View: Normal",ch:"👁️ View: High Contrast",sp:"Hitomirai Festa 2026 has ended. Thank you very much for taking part. We hope to see you again next year! This page will no longer be available after Friday, October 23.",vl:"en-US",sub:"Hitomirai Festa 2026",thanks:"Hitomirai Festa 2026 has ended.<br>Thank you very much for taking part.<br>We hope to see you again next year!",notice:"This page will no longer be available after Friday, October 23.",cw:"🟢 Wakuwaku Course",cu:"🔵 Ukiuki Course",go:"Website 🔗",
+s:{W1:["Kodomo no Yakata","Indoor play facility filled with child-friendly fun!"],W2:["Youth Station","Third place for youth!"],W3:["Kitakyushu International Association","Kitakyushu City Information Center for Foreigners"],W4:["Civic Activity Support Center","Supporting NPOs and civic activities"],U1:["Welfare Center for Persons with Disabilities","Supporting daily life and activities"],U2:["Youth Work Plaza","Employment support center for young people"],U3:["Silver Human Resources Center","Supporting senior workers"],U4:["Yahatanishi Lifelong Learning Center","A place for learning and connecting"]}},
+zh:{as:"听取语音指南",ap:"停止语音",cn:"👁️ 视觉：普通（彩色）",ch:"👁️ 视觉：清晰（黑白）",sp:"2026年Hitomirai Festa已经结束。感谢大家的参与。期待明年再次相见！本页面将于10月23日，周五之后关闭。",vl:"zh-CN",sub:"Hitomirai Festa 2026",thanks:"2026年Hitomirai Festa已经结束。<br>感谢大家的参与。<br>期待明年再次相见！",notice:"本页面将于10月23日（周五）之后关闭。",cw:"🟢 欢乐路线",cu:"🔵 无忧路线",go:"访问官方网站 🔗",
+s:{W1:["北九州市立儿童馆","室内游乐设施♪"],W2:["青少年驿站","青少年的空间！"],W3:["北九州国际交流协会","北九州市 外国人咨询中心"],W4:["市民活动服务中心","支持NPO与市民活动"],U1:["西部残疾人福利会馆","支持残疾人生活的设施"],U2:["青年就业广场","青年就职支援拠点"],U3:["银发人才中心","支持高龄者就职"],U4:["八幡西生涯学习中心","学习与交流的基地"]}},
+ko:{as:"음성 가이드 듣기",ap:"음성 중지",cn:"👁️ 보기: 보통 (컬러)",ch:"👁️ 보기: 또렷하게 (흑백)",sp:"2026년 Hitomirai Festa가 종료되었습니다. 많은 참여 감사드립니다. 내년에도 꼭 참여해 주세요! 이 페이지는 10월 23일, 금요일 이후에는 볼 수 없습니다.",vl:"ko-KR",sub:"Hitomirai Festa 2026",thanks:"2026년 Hitomirai Festa가 종료되었습니다.<br>많은 참여 감사드립니다.<br>내년에도 꼭 참여해 주세요!",notice:"이 페이지는 10월 23일(금) 이후에는 볼 수 없습니다.",cw:"🟢 두근두근 코스",cu:"🔵 신나고 코스",go:"홈페이지 보기 🔗",
+s:{W1:["기타큐슈 시립 어린이 집","실내 놀이 시설♪"],W2:["청소년 스테이션","청소년을 위한 공간!"],W3:["기타큐슈 국제교류협회","외국인 인포메이션센터"],W4:["시민활동 지원센터","시민활동 및 NPO 지원"],U1:["서부 장애인 복지회관","장애인 활동 및 생활 지원"],U2:["청년 워크 프라자","청년 취업 지원 거점"],U3:["실버 인재 센터","고령자 취업 지원"],U4:["야하타니시 평생학습센터","배움과 연결의 거점"]}}
+};
+function card(c,t){var d=L[t].s[c];return '<div class="spot"><img src="'+imgs[c]+'" alt="'+c+'"><div><div class="spot-name">'+d[0]+'</div><div class="spot-msg">'+d[1]+'</div><a class="link-btn" href="'+urls[c]+'" target="_blank" rel="noopener">'+L[t].go+'</a></div></div>';}
+var cur='ja',hc=false,synth=(window.speechSynthesis||null);
+function stopSpeech(){try{if(synth&&synth.speaking)synth.cancel()}catch(e){}refreshAudio()}
+function refreshAudio(){document.getElementById('audioBtn').classList.remove('playing');document.getElementById('audioTxt').innerText=L[cur].as}
+function toggleSpeech(){
+  if(!synth||typeof SpeechSynthesisUtterance==='undefined'){alert("このブラウザは音声読み上げに対応していません。");return}
+  try{
+    if(synth.speaking){stopSpeech();return}
+    var u=new SpeechSynthesisUtterance(L[cur].sp);
+    u.lang=L[cur].vl;u.rate=0.95;
+    u.onend=refreshAudio;u.onerror=refreshAudio;
+    document.getElementById('audioBtn').classList.add('playing');
+    document.getElementById('audioTxt').innerText=L[cur].ap;
+    synth.speak(u);
+  }catch(e){}
+}
+function toggleContrast(){hc=!hc;document.body.classList.toggle('hc',hc);refreshContrast()}
+function refreshContrast(){document.getElementById('contrastBtn').innerText=hc?L[cur].cn:L[cur].ch}
+function setLang(t){
+  stopSpeech();cur=t;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active')});
+  document.getElementById('btn-'+t).classList.add('active');
+  document.documentElement.lang=t;
+  var x=L[t],sub=document.getElementById('sub');
+  sub.innerText=x.sub;sub.style.display=x.sub?'block':'none';
+  document.getElementById('thanks').innerHTML=x.thanks;
+  document.getElementById('notice').innerText=x.notice;
+  document.getElementById('titleW').innerText=x.cw;
+  document.getElementById('titleU').innerText=x.cu;
+  document.getElementById('listW').innerHTML=['W1','W2','W3','W4'].map(function(c){return card(c,t)}).join('');
+  document.getElementById('listU').innerHTML=['U1','U2','U3','U4'].map(function(c){return card(c,t)}).join('');
+  refreshAudio();refreshContrast();
+}
+setLang('ja');
 </script>
-
 </body>
 </html>
